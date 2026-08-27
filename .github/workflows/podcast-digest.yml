@@ -1,0 +1,45 @@
+name: Podcast Digest
+
+on:
+  schedule:
+    # Runs at 13:00 UTC daily = 9am ET / 8am CT.
+    # Adjust to your timezone: cron times are always UTC.
+    - cron: "0 13 * * *"
+  workflow_dispatch: {}  # lets you trigger a run manually from the Actions tab
+
+jobs:
+  run-digest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # needed to commit the updated state file back
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ffmpeg (needed to split long episodes)
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run podcast digest
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          DIGEST_TO_EMAIL: ${{ secrets.DIGEST_TO_EMAIL }}
+        run: python scripts/podcast_digest.py
+
+      - name: Commit updated state
+        run: |
+          git config user.name "podcast-digest-bot"
+          git config user.email "actions@github.com"
+          git add state/seen_episodes.json
+          git diff --staged --quiet || git commit -m "Update seen episodes state"
+          git push
