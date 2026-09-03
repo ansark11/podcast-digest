@@ -2,8 +2,8 @@
 
 Daily pipeline that checks a fixed list of podcasts for new episodes,
 transcribes them (OpenAI Whisper), summarizes them into key points
-(Claude), and emails you a digest. Runs automatically on GitHub Actions
-— no server or laptop needs to stay on.
+(GPT-5.6 Luna), and emails you a digest. Runs automatically on GitHub
+Actions — no server or laptop needs to stay on.
 
 **Note:** this only works for shows with a public RSS feed. Spotify
 Originals/exclusives don't publish one, so they can't be pulled this way.
@@ -27,8 +27,7 @@ shows:
 ```
 
 ### 3. Get your API keys
-- **OpenAI API key** (for transcription): platform.openai.com → API keys
-- **Anthropic API key** (for summarization): console.anthropic.com → API keys
+- **OpenAI API key** (for transcription and summarization): platform.openai.com → API keys
 - **Gmail app password** (for sending the email): Google Account →
   Security → 2-Step Verification → App passwords. Generate one for "Mail".
   (Your normal Gmail password won't work here — Google requires an app
@@ -42,7 +41,6 @@ Add each of these:
 | Secret name | Value |
 |---|---|
 | `OPENAI_API_KEY` | your OpenAI key |
-| `ANTHROPIC_API_KEY` | your Anthropic key |
 | `GMAIL_ADDRESS` | the Gmail address to send from |
 | `GMAIL_APP_PASSWORD` | the app password from step 3 |
 | `DIGEST_TO_EMAIL` | where the digest should be sent (can be the same address) |
@@ -70,17 +68,13 @@ waiting for the schedule.
 
 ## Costs
 Whisper API is about $0.006/minute of audio. A handful of ~45-minute
-episodes per week runs a few dollars a month. Claude summarization cost
-is small per episode (well under a cent to a few cents depending on
+episodes per week runs a few dollars a month. GPT-5.6 Luna summarization
+cost is small per episode (well under a cent to a few cents depending on
 transcript length).
 
 ## Local testing
 ```bash
 pip install -r requirements.txt
-export OPENAI_API_KEY=...
-export ANTHROPIC_API_KEY=...
-export GMAIL_ADDRESS=...
-export GMAIL_APP_PASSWORD=...
-export DIGEST_TO_EMAIL=...
+cp .env.example .env   # then fill in your keys/password — .env is gitignored
 python scripts/podcast_digest.py
 ```

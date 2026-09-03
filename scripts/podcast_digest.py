@@ -3,12 +3,11 @@ Podcast Digest Pipeline
 ------------------------
 Checks a fixed list of podcast RSS feeds for new episodes, transcribes
 new audio with the OpenAI Whisper API, summarizes each transcript with
-Claude, and emails a digest. Designed to run on a schedule via GitHub
-Actions (see .github/workflows/podcast-digest.yml).
+GPT-5.6 Luna, and emails a digest. Designed to run on a schedule via
+GitHub Actions (see .github/workflows/podcast-digest.yml).
 
 Required environment variables (set as GitHub Actions secrets):
-  OPENAI_API_KEY       - OpenAI API key (for Whisper transcription)
-  ANTHROPIC_API_KEY    - Anthropic API key (for summarization)
+  OPENAI_API_KEY       - OpenAI API key (for Whisper transcription and summarization)
   GMAIL_ADDRESS        - Gmail address to send from
   GMAIL_APP_PASSWORD   - Gmail app password (not your normal password)
   DIGEST_TO_EMAIL      - Where the digest should be sent
@@ -25,21 +24,22 @@ from pathlib import Path
 
 import feedparser
 import requests
+from dotenv import load_dotenv
 from openai import OpenAI
-from anthropic import Anthropic
 from pydub import AudioSegment
 from pydub.utils import make_chunks
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 SHOWS_FILE = BASE_DIR / "config" / "shows.json"
 STATE_FILE = BASE_DIR / "state" / "seen_episodes.json"
 
 WHISPER_MAX_BYTES = 24 * 1024 * 1024  # stay safely under the 25MB API limit
 CHUNK_MS = 10 * 60 * 1000             # split long episodes into 10-minute chunks
 MAX_NEW_EPISODES_PER_SHOW = 3         # safety cap per run, per show
+SUMMARY_MODEL = "gpt-5.6-luna"
 
 openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-anthropic_client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
 
 def load_json(path, default):
@@ -127,12 +127,12 @@ Write:
 
 Keep it concise and scannable. Plain text, no markdown headers."""
 
-    response = anthropic_client.messages.create(
-        model="claude-sonnet-5",
-        max_tokens=1200,
+    response = openai_client.chat.completions.create(
+        model=SUMMARY_MODEL,
+        max_completion_tokens=1200,
         messages=[{"role": "user", "content": prompt}],
     )
-    return "".join(block.text for block in response.content if block.type == "text")
+    return response.choices[0].message.content
 
 
 def send_digest_email(digest_sections):
