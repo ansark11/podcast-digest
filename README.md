@@ -54,6 +54,14 @@ Go to the **Actions** tab in your repo → "Podcast Digest" workflow →
 **Run workflow** to trigger it manually and confirm it works before
 waiting for the schedule.
 
+## Reviewing what the pipeline actually did
+Every processed episode writes a JSON file to `runs/` (gitignored locally)
+containing the full transcript, the exact prompt sent to the model, and
+the raw summary it returned — useful for spot-checking quality or building
+your own eval harness. On GitHub Actions, the same files are uploaded as
+a downloadable workflow artifact (Actions tab → the run → Artifacts)
+since the runner's filesystem doesn't persist between runs.
+
 ## How it works
 1. GitHub Actions runs `scripts/podcast_digest.py` on a cron schedule
    (default: 9am ET daily — edit the `cron` line in

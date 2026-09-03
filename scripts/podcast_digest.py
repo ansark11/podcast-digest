@@ -6,6 +6,9 @@ new audio with the OpenAI Whisper API, summarizes each transcript with
 GPT-5.6 Luna, and emails a digest. Designed to run on a schedule via
 GitHub Actions (see .github/workflows/podcast-digest.yml).
 
+Each processed episode's transcript, exact prompt, and raw summary are
+saved to runs/<timestamp>_<title>.json for review and eval purposes.
+
 Required environment variables (set as GitHub Actions secrets):
   OPENAI_API_KEY       - OpenAI API key (for Whisper transcription and summarization)
   GMAIL_ADDRESS        - Gmail address to send from
@@ -33,6 +36,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 SHOWS_FILE = BASE_DIR / "config" / "shows.json"
 STATE_FILE = BASE_DIR / "state" / "seen_episodes.json"
+RUNS_DIR = BASE_DIR / "runs"
 
 WHISPER_MAX_BYTES = 24 * 1024 * 1024  # stay safely under the 25MB API limit
 CHUNK_MS = 10 * 60 * 1000             # split long episodes into 10-minute chunks
@@ -111,8 +115,8 @@ def transcribe_audio(file_path):
     return " ".join(transcript_parts)
 
 
-def summarize_transcript(show_name, episode_title, transcript):
-    prompt = f"""You're summarizing a podcast episode for a personal digest email.
+def build_summary_prompt(show_name, episode_title, transcript):
+    return f"""You're summarizing a podcast episode for a personal digest email.
 
 Show: {show_name}
 Episode: {episode_title}
@@ -127,12 +131,35 @@ Write:
 
 Keep it concise and scannable. Plain text, no markdown headers."""
 
+
+def summarize_transcript(prompt):
     response = openai_client.chat.completions.create(
         model=SUMMARY_MODEL,
         max_completion_tokens=1200,
         messages=[{"role": "user", "content": prompt}],
     )
     return response.choices[0].message.content
+
+
+def save_episode_artifact(show_name, episode, transcript, prompt, summary):
+    """Persist everything needed to review or eval this episode's summary later."""
+    safe_title = "".join(c if c.isalnum() or c in " -_" else "_" for c in episode["title"])[:80]
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    path = RUNS_DIR / f"{timestamp}_{safe_title}.json"
+    save_json(path, {
+        "show": show_name,
+        "episode_title": episode["title"],
+        "guid": episode["guid"],
+        "published": episode["published"],
+        "audio_url": episode["audio_url"],
+        "transcription_model": "whisper-1",
+        "summary_model": SUMMARY_MODEL,
+        "prompt": prompt,
+        "transcript": transcript,
+        "summary": summary,
+        "processed_at": timestamp,
+    })
+    print(f"  Saved run artifact: {path.relative_to(BASE_DIR)}")
 
 
 def send_digest_email(digest_sections):
@@ -178,8 +205,10 @@ def main():
                     audio_path = os.path.join(tmp_dir, "episode.mp3")
                     download_audio(ep["audio_url"], audio_path)
                     transcript = transcribe_audio(audio_path)
-                    summary = summarize_transcript(name, ep["title"], transcript)
+                    prompt = build_summary_prompt(name, ep["title"], transcript)
+                    summary = summarize_transcript(prompt)
 
+                save_episode_artifact(name, ep, transcript, prompt, summary)
                 digest_sections.append(f"=== {name}: {ep['title']} ===\n{summary}")
                 seen_guids.add(ep["guid"])
             except Exception as e:
