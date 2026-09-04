@@ -1,9 +1,10 @@
 # Podcast Digest
 
 Daily pipeline that checks a fixed list of podcasts for new episodes,
-transcribes them (OpenAI Whisper), summarizes them into key points
-(GPT-5.6 Luna), and emails you a digest. Runs automatically on GitHub
-Actions — no server or laptop needs to stay on.
+transcribes them (using the feed's own published transcript when one is
+freely available, otherwise OpenAI's gpt-transcribe), summarizes them
+into key points (GPT-5.6 Luna), and emails you a digest. Runs
+automatically on GitHub Actions — no server or laptop needs to stay on.
 
 **Note:** this only works for shows with a public RSS feed. Spotify
 Originals/exclusives don't publish one, so they can't be pulled this way.
@@ -68,17 +69,22 @@ since the runner's filesystem doesn't persist between runs.
    `.github/workflows/podcast-digest.yml` to change it)
 2. For each show, it checks the RSS feed for episodes not yet in
    `state/seen_episodes.json`
-3. New episodes are downloaded, transcribed (chunked automatically if
-   over Whisper's 25MB limit), and summarized
-4. If anything new was found, one digest email is sent covering all of it
+3. If the feed publishes a usable `<podcast:transcript>` for an episode,
+   that's used directly. Otherwise the audio is downloaded and
+   transcribed with gpt-transcribe (chunked automatically if over the
+   25MB API limit), using the show/episode name as context to improve
+   accuracy on names and terms
+4. Each transcript is summarized; if anything new was found, one digest
+   email is sent covering all of it
 5. `state/seen_episodes.json` is updated and committed back to the repo,
    so the same episode is never processed twice
 
 ## Costs
-Whisper API is about $0.006/minute of audio. A handful of ~45-minute
-episodes per week runs a few dollars a month. GPT-5.6 Luna summarization
-cost is small per episode (well under a cent to a few cents depending on
-transcript length).
+gpt-transcribe is about $0.0045/minute of audio (only charged when a
+show doesn't already publish a usable transcript). A handful of
+~45-minute episodes per week runs a couple dollars a month. GPT-5.6 Luna
+summarization cost is small per episode (well under a cent to a few
+cents depending on transcript length).
 
 ## Local testing
 ```bash

@@ -1,16 +1,18 @@
 """
 Podcast Digest Pipeline
 ------------------------
-Checks a fixed list of podcast RSS feeds for new episodes, transcribes
-new audio with the OpenAI Whisper API, summarizes each transcript with
-GPT-5.6 Luna, and emails a digest. Designed to run on a schedule via
+Checks a fixed list of podcast RSS feeds for new episodes. If a feed
+publishes a usable Podcasting 2.0 <podcast:transcript> tag, that's used
+directly; otherwise audio is downloaded and transcribed with OpenAI's
+gpt-transcribe. Each transcript is summarized with GPT-5.6 Luna, and one
+digest email covers everything new. Designed to run on a schedule via
 GitHub Actions (see .github/workflows/podcast-digest.yml).
 
 Each processed episode's transcript, exact prompt, and raw summary are
 saved to runs/<timestamp>_<title>.json for review and eval purposes.
 
 Required environment variables (set as GitHub Actions secrets):
-  OPENAI_API_KEY       - OpenAI API key (for Whisper transcription and summarization)
+  OPENAI_API_KEY       - OpenAI API key (for transcription and summarization)
   GMAIL_ADDRESS        - Gmail address to send from
   GMAIL_APP_PASSWORD   - Gmail app password (not your normal password)
   DIGEST_TO_EMAIL      - Where the digest should be sent
@@ -38,10 +40,14 @@ SHOWS_FILE = BASE_DIR / "config" / "shows.json"
 STATE_FILE = BASE_DIR / "state" / "seen_episodes.json"
 RUNS_DIR = BASE_DIR / "runs"
 
-WHISPER_MAX_BYTES = 24 * 1024 * 1024  # stay safely under the 25MB API limit
-CHUNK_MS = 10 * 60 * 1000             # split long episodes into 10-minute chunks
-MAX_NEW_EPISODES_PER_SHOW = 3         # safety cap per run, per show
+TRANSCRIPTION_MAX_BYTES = 24 * 1024 * 1024  # stay safely under the 25MB API limit
+CHUNK_MS = 10 * 60 * 1000                   # split long episodes into 10-minute chunks
+MAX_NEW_EPISODES_PER_SHOW = 3               # safety cap per run, per show
+MAX_TRANSCRIPT_CHARS = 400_000              # well under GPT-5.6 Luna's ~1M token context window
+MIN_FEED_TRANSCRIPT_CHARS = 500             # below this, treat a feed transcript as bogus/placeholder
+TRANSCRIPTION_MODEL = "gpt-transcribe"
 SUMMARY_MODEL = "gpt-5.6-luna"
+SUPPORTED_FEED_TRANSCRIPT_TYPES = {"text/plain", "text/vtt", "application/srt", "text/srt"}
 
 openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
@@ -77,6 +83,7 @@ def get_latest_episodes(rss_url, limit=MAX_NEW_EPISODES_PER_SHOW):
                 "title": entry.get("title", "Untitled episode"),
                 "audio_url": audio_url,
                 "published": entry.get("published", ""),
+                "feed_transcript_tag": entry.get("podcast_transcript"),
             })
     return episodes
 
@@ -89,20 +96,64 @@ def download_audio(url, dest_path):
                 f.write(chunk)
 
 
-def _transcribe_chunk(file_path):
+def _strip_caption_timing(text):
+    """Reduce VTT/SRT caption text to plain prose by dropping cue numbers and timestamps."""
+    lines = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line == "WEBVTT" or line.isdigit() or "-->" in line:
+            continue
+        lines.append(line)
+    return " ".join(lines)
+
+
+def fetch_feed_transcript(transcript_tag):
+    """Use a podcast's own published <podcast:transcript>, if present and fetchable.
+
+    Returns None (falling back to ASR) if there's no tag, the format isn't one
+    we handle, the fetch fails, or the content looks too short to be real.
+    """
+    if not transcript_tag:
+        return None
+    url = transcript_tag.get("url")
+    fmt = transcript_tag.get("type", "")
+    if not url or fmt not in SUPPORTED_FEED_TRANSCRIPT_TYPES:
+        return None
+
+    try:
+        resp = requests.get(url, timeout=30)
+        resp.raise_for_status()
+    except requests.RequestException:
+        return None
+
+    text = resp.text
+    if fmt in ("text/vtt", "application/srt", "text/srt"):
+        text = _strip_caption_timing(text)
+    text = text.strip()
+
+    if len(text) < MIN_FEED_TRANSCRIPT_CHARS:
+        return None
+    return text
+
+
+def _transcribe_chunk(file_path, context=None):
     with open(file_path, "rb") as f:
-        result = openai_client.audio.transcriptions.create(
-            model="whisper-1",
-            file=f,
-        )
+        kwargs = {"model": TRANSCRIPTION_MODEL, "file": f}
+        if context:
+            kwargs["prompt"] = context
+        result = openai_client.audio.transcriptions.create(**kwargs)
     return result.text
 
 
-def transcribe_audio(file_path):
-    """Transcribe audio with Whisper, splitting into chunks if the file is too large."""
+def transcribe_audio(file_path, context=None):
+    """Transcribe audio, splitting into chunks if the file is too large.
+
+    `context` is passed as the model's prompt hint (show/episode name) to
+    improve accuracy on proper nouns without a second transcription pass.
+    """
     size = os.path.getsize(file_path)
-    if size <= WHISPER_MAX_BYTES:
-        return _transcribe_chunk(file_path)
+    if size <= TRANSCRIPTION_MAX_BYTES:
+        return _transcribe_chunk(file_path, context=context)
 
     audio = AudioSegment.from_file(file_path)
     chunks = make_chunks(audio, CHUNK_MS)
@@ -111,18 +162,22 @@ def transcribe_audio(file_path):
         for i, chunk in enumerate(chunks):
             chunk_path = os.path.join(tmp_dir, f"chunk_{i}.mp3")
             chunk.export(chunk_path, format="mp3")
-            transcript_parts.append(_transcribe_chunk(chunk_path))
+            transcript_parts.append(_transcribe_chunk(chunk_path, context=context))
     return " ".join(transcript_parts)
 
 
 def build_summary_prompt(show_name, episode_title, transcript):
+    if len(transcript) > MAX_TRANSCRIPT_CHARS:
+        print(f"  Warning: transcript is {len(transcript)} chars, truncating to {MAX_TRANSCRIPT_CHARS} for summarization")
+        transcript = transcript[:MAX_TRANSCRIPT_CHARS]
+
     return f"""You're summarizing a podcast episode for a personal digest email.
 
 Show: {show_name}
 Episode: {episode_title}
 
 Transcript:
-{transcript[:100000]}
+{transcript}
 
 Write:
 1. A 2-3 sentence overview
@@ -141,7 +196,7 @@ def summarize_transcript(prompt):
     return response.choices[0].message.content
 
 
-def save_episode_artifact(show_name, episode, transcript, prompt, summary):
+def save_episode_artifact(show_name, episode, transcript, prompt, summary, transcription_source):
     """Persist everything needed to review or eval this episode's summary later."""
     safe_title = "".join(c if c.isalnum() or c in " -_" else "_" for c in episode["title"])[:80]
     timestamp = time.strftime("%Y%m%d_%H%M%S")
@@ -152,7 +207,7 @@ def save_episode_artifact(show_name, episode, transcript, prompt, summary):
         "guid": episode["guid"],
         "published": episode["published"],
         "audio_url": episode["audio_url"],
-        "transcription_model": "whisper-1",
+        "transcription_source": transcription_source,
         "summary_model": SUMMARY_MODEL,
         "prompt": prompt,
         "transcript": transcript,
@@ -201,14 +256,21 @@ def main():
         for ep in new_episodes:
             print(f"Processing new episode: {name} — {ep['title']}")
             try:
-                with tempfile.TemporaryDirectory() as tmp_dir:
-                    audio_path = os.path.join(tmp_dir, "episode.mp3")
-                    download_audio(ep["audio_url"], audio_path)
-                    transcript = transcribe_audio(audio_path)
-                    prompt = build_summary_prompt(name, ep["title"], transcript)
-                    summary = summarize_transcript(prompt)
+                transcript = fetch_feed_transcript(ep.get("feed_transcript_tag"))
+                if transcript:
+                    print("  Using transcript published in the feed (skipped audio transcription)")
+                    transcription_source = "feed"
+                else:
+                    with tempfile.TemporaryDirectory() as tmp_dir:
+                        audio_path = os.path.join(tmp_dir, "episode.mp3")
+                        download_audio(ep["audio_url"], audio_path)
+                        transcript = transcribe_audio(audio_path, context=f"Podcast: {name}. Episode: {ep['title']}.")
+                    transcription_source = TRANSCRIPTION_MODEL
 
-                save_episode_artifact(name, ep, transcript, prompt, summary)
+                prompt = build_summary_prompt(name, ep["title"], transcript)
+                summary = summarize_transcript(prompt)
+
+                save_episode_artifact(name, ep, transcript, prompt, summary, transcription_source)
                 digest_sections.append(f"=== {name}: {ep['title']} ===\n{summary}")
                 seen_guids.add(ep["guid"])
             except Exception as e:
