@@ -58,10 +58,31 @@ waiting for the schedule.
 ## Reviewing what the pipeline actually did
 Every processed episode writes a JSON file to `runs/` (gitignored locally)
 containing the full transcript, the exact prompt sent to the model, and
-the raw summary it returned — useful for spot-checking quality or building
-your own eval harness. On GitHub Actions, the same files are uploaded as
-a downloadable workflow artifact (Actions tab → the run → Artifacts)
-since the runner's filesystem doesn't persist between runs.
+the raw summary it returned. On GitHub Actions, the same files are
+uploaded as a downloadable workflow artifact (Actions tab → the run →
+Artifacts) since the runner's filesystem doesn't persist between runs.
+
+## Evaluating summary quality
+```bash
+# Backfill past episodes into runs/ to get eval data without waiting
+# for new episodes (real transcription/summarization cost applies):
+python scripts/backfill_runs.py --count 12
+
+# Automated LLM-as-judge pass: scores every runs/ artifact for
+# faithfulness, topic coverage, and proper-noun accuracy, and flags
+# specific hallucinations/missed topics. Writes evals/<name>.json.
+python scripts/eval_runs.py judge
+
+# Walk through judged episodes interactively and record your own
+# 1-5 score + notes, to calibrate against the automated judge.
+python scripts/eval_runs.py review
+
+# Print (and save to evals/report.md) a table comparing judge vs.
+# human scores across every evaluated episode.
+python scripts/eval_runs.py report
+```
+`evals/` is gitignored, same as `runs/` — this is local review tooling,
+not part of the production digest pipeline.
 
 ## How it works
 1. GitHub Actions runs `scripts/podcast_digest.py` on a cron schedule

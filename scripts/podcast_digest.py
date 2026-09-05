@@ -236,6 +236,25 @@ def send_digest_email(digest_sections):
         server.send_message(msg)
 
 
+def process_episode(show_name, episode):
+    """Transcribe + summarize one episode, saving a runs/ artifact. Returns the summary text."""
+    transcript = fetch_feed_transcript(episode.get("feed_transcript_tag"))
+    if transcript:
+        print("  Using transcript published in the feed (skipped audio transcription)")
+        transcription_source = "feed"
+    else:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            audio_path = os.path.join(tmp_dir, "episode.mp3")
+            download_audio(episode["audio_url"], audio_path)
+            transcript = transcribe_audio(audio_path, context=f"Podcast: {show_name}. Episode: {episode['title']}.")
+        transcription_source = TRANSCRIPTION_MODEL
+
+    prompt = build_summary_prompt(show_name, episode["title"], transcript)
+    summary = summarize_transcript(prompt)
+    save_episode_artifact(show_name, episode, transcript, prompt, summary, transcription_source)
+    return summary
+
+
 def main():
     shows = load_json(SHOWS_FILE, [])
     if not shows:
@@ -256,21 +275,7 @@ def main():
         for ep in new_episodes:
             print(f"Processing new episode: {name} — {ep['title']}")
             try:
-                transcript = fetch_feed_transcript(ep.get("feed_transcript_tag"))
-                if transcript:
-                    print("  Using transcript published in the feed (skipped audio transcription)")
-                    transcription_source = "feed"
-                else:
-                    with tempfile.TemporaryDirectory() as tmp_dir:
-                        audio_path = os.path.join(tmp_dir, "episode.mp3")
-                        download_audio(ep["audio_url"], audio_path)
-                        transcript = transcribe_audio(audio_path, context=f"Podcast: {name}. Episode: {ep['title']}.")
-                    transcription_source = TRANSCRIPTION_MODEL
-
-                prompt = build_summary_prompt(name, ep["title"], transcript)
-                summary = summarize_transcript(prompt)
-
-                save_episode_artifact(name, ep, transcript, prompt, summary, transcription_source)
+                summary = process_episode(name, ep)
                 digest_sections.append(f"=== {name}: {ep['title']} ===\n{summary}")
                 seen_guids.add(ep["guid"])
             except Exception as e:
