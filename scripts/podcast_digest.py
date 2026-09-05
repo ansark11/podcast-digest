@@ -181,19 +181,33 @@ Transcript:
 
 Write:
 1. A 2-3 sentence overview
-2. 5-8 bullet-point key takeaways
+2. Bullet-point key takeaways covering every major topic or question the
+   episode actually discusses. Do not compress a wide-ranging conversation
+   down to a fixed number of bullets — a dense episode covering many
+   distinct topics should get more bullets than a narrow, single-topic one.
+   Keep each bullet to 1-2 sentences, but do not drop a distinct topic just
+   to keep the list short.
 3. Any notable quotes or resources mentioned (if any)
 
-Keep it concise and scannable. Plain text, no markdown headers."""
+Keep bullets scannable. Plain text, no markdown headers."""
 
 
 def summarize_transcript(prompt):
     response = openai_client.chat.completions.create(
         model=SUMMARY_MODEL,
-        max_completion_tokens=1200,
+        max_completion_tokens=4000,
+        reasoning_effort="low",  # this is synthesis, not multi-step reasoning — "medium" (the
+                                  # default) can burn the entire token budget on internal
+                                  # reasoning and return empty content on open-ended prompts
         messages=[{"role": "user", "content": prompt}],
     )
-    return response.choices[0].message.content
+    summary = response.choices[0].message.content
+    if not summary:
+        raise RuntimeError(
+            f"Empty summary from {SUMMARY_MODEL} (finish_reason={response.choices[0].finish_reason}, "
+            f"reasoning_tokens={response.usage.completion_tokens_details.reasoning_tokens})"
+        )
+    return summary
 
 
 def save_episode_artifact(show_name, episode, transcript, prompt, summary, transcription_source):
