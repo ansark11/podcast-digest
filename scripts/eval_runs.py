@@ -36,6 +36,13 @@ EVALS_DIR = pd.BASE_DIR / "evals"
 JUDGE_MODEL = pd.SUMMARY_MODEL
 META_JUDGE_MODEL = "gpt-5.6-sol"
 
+# "overall" is computed from these, not scored independently by the judge —
+# see compute_overall(). Faithfulness weighted highest since a fabrication
+# actively misleads, vs. coverage where an omission just leaves a gap.
+FAITHFULNESS_WEIGHT = 0.45
+COVERAGE_WEIGHT = 0.35
+PROPER_NOUN_WEIGHT = 0.20
+
 JUDGE_PROMPT = """You are an evaluator grading how well a podcast episode summary represents its transcript. Be strict — flag anything in the summary that isn't actually supported by the transcript, and anything significant the transcript covers that the summary skips.
 
 Show: {show}
@@ -47,10 +54,30 @@ Transcript:
 Summary to evaluate:
 {summary}
 
-Score 1-5 (5 = best) on each dimension:
-- faithfulness: summary makes no claims unsupported by the transcript
-- coverage: summary captures the episode's major topics/questions
-- proper_noun_accuracy: names, companies, and terms in the summary match the transcript
+Score 1-5 on each dimension, using these exact definitions:
+
+FAITHFULNESS (does the summary avoid claims unsupported by the transcript?)
+5: Every statement is directly traceable to the transcript.
+4: Trivial rewording or an obviously-implied inference, but no fabricated facts.
+3: One or two minor unsupported claims stated as fact, but nothing that changes the reader's understanding.
+2: Multiple unsupported claims, or one substantive fabrication misrepresenting what a speaker said/did.
+1: Contains claims that materially contradict or invent content not in the transcript — a reader would come away wrong about what happened.
+
+COVERAGE (does the summary capture the episode's major topics/questions?)
+5: Every major topic/segment discussed is represented, even minor sub-threads.
+4: All major topics covered; only very minor tangents omitted.
+3: One substantive topic/segment is missing entirely, but the episode's central throughline is still intact and correctly represented.
+2: Multiple substantive topics are missing (roughly half or more of the distinct topics discussed), but the summary still correctly identifies what the episode was broadly about.
+1: The summary fails to represent the episode's actual core subject/throughline — a reader would misunderstand what the episode was fundamentally about, not just miss side topics.
+
+PROPER_NOUN_ACCURACY (do names/companies/terms in the summary match the transcript?)
+5: Every name, company, and term matches exactly.
+4: One trivial variant with no risk of confusing who/what is being discussed.
+3: A couple of small errors on minor mentions, main narrative unaffected.
+2: A name/entity central to the episode is misspelled or misidentified.
+1: Multiple central names are wrong, or a claim is attributed to the wrong person — real confusion about who said/did what.
+
+Do NOT compute an overall score — that's calculated separately from these three.
 
 Respond with ONLY valid JSON in this exact shape:
 {{
@@ -60,7 +87,6 @@ Respond with ONLY valid JSON in this exact shape:
   "missed_topics": [<specific topic strings>],
   "proper_noun_accuracy": <1-5>,
   "flagged_terms": [<specific name/term strings that look wrong>],
-  "overall": <1-5>,
   "rationale": "<1-3 sentence justification>"
 }}"""
 
@@ -104,7 +130,18 @@ def run_judge_scores(model, show, title, transcript, summary):
             f"Empty judge response from {model} (finish_reason={response.choices[0].finish_reason}, "
             f"reasoning_tokens={response.usage.completion_tokens_details.reasoning_tokens})"
         )
-    return json.loads(content)
+    result = json.loads(content)
+    result["overall"] = compute_overall(result)
+    return result
+
+
+def compute_overall(scores):
+    return round(
+        scores["faithfulness"] * FAITHFULNESS_WEIGHT
+        + scores["coverage"] * COVERAGE_WEIGHT
+        + scores["proper_noun_accuracy"] * PROPER_NOUN_WEIGHT,
+        2,
+    )
 
 
 def judge_run(run_path):
