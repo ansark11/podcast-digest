@@ -2,11 +2,13 @@
 Eval harness for runs/ artifacts produced by podcast_digest.py.
 
 Two layers of judgment on the same data:
-  judge   Automated LLM-as-judge pass, using Claude Opus 5 — a different
-          vendor and model from the summarizer (Claude Sonnet 5), so this
-          isn't a self-grading setup. Scores each summary against its own
-          transcript for faithfulness, topic coverage, and proper-noun
-          accuracy. Flags specific hallucinated claims and missed topics.
+  judge   Automated LLM-as-judge pass. JUDGE_MODEL must stay a different
+          model from podcast_digest.SUMMARY_MODEL — a judge grading its own
+          family's output inflates scores. The model reports *what* is wrong
+          (hallucinations, distortions, missed topics, flagged terms) and how
+          severe each item is; the 1-5 scores are derived from that evidence
+          in code, never assigned by the model. Requires ANTHROPIC_API_KEY
+          only when JUDGE_MODEL is a Claude model.
   review  Interactive human scoring — walks through judged runs missing a
           human rating and records your own 1-5 score + notes, so you can
           calibrate yourself against the judge.
@@ -21,12 +23,26 @@ Usage:
 
 import argparse
 import json
+import os
 import time
+
+import anthropic
 
 import podcast_digest as pd
 
 EVALS_DIR = pd.BASE_DIR / "evals"
 JUDGE_MODEL = "claude-opus-5"
+
+# Built lazily: the judge only needs an Anthropic key when JUDGE_MODEL is a
+# Claude model, and `report` / `review` need no API access at all.
+_anthropic_client = None
+
+
+def _get_anthropic_client():
+    global _anthropic_client
+    if _anthropic_client is None:
+        _anthropic_client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    return _anthropic_client
 
 # "overall" is computed from the three dimension scores, which are themselves
 # derived in code from the judge's evidence lists — see derive_scores(). The
@@ -103,7 +119,7 @@ def call_llm_json(model, prompt, max_tokens=2500):
     JSON mode on Sonnet 5/Opus 5, so we rely on prompt instructions + fence
     stripping there instead of OpenAI's response_format=json_object."""
     if model.startswith("claude"):
-        response = pd.anthropic_client.messages.create(
+        response = _get_anthropic_client().messages.create(
             model=model,
             max_tokens=max_tokens,
             output_config={"effort": "low"},  # scoring against a rubric, not hard reasoning —

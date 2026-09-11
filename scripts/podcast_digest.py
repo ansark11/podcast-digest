@@ -4,7 +4,7 @@ Podcast Digest Pipeline
 Checks a fixed list of podcast RSS feeds for new episodes. If a feed
 publishes a usable Podcasting 2.0 <podcast:transcript> tag, that's used
 directly; otherwise audio is downloaded and transcribed with OpenAI's
-gpt-transcribe. Each transcript is summarized with Claude Sonnet 5, and
+gpt-transcribe. Each transcript is summarized with GPT-5.6 Luna, and
 one digest email covers everything new. Designed to run on a schedule
 via GitHub Actions (see .github/workflows/podcast-digest.yml).
 
@@ -12,8 +12,7 @@ Each processed episode's transcript, exact prompt, and raw summary are
 saved to runs/<timestamp>_<title>.json for review and eval purposes.
 
 Required environment variables (set as GitHub Actions secrets):
-  OPENAI_API_KEY       - OpenAI API key (for transcription)
-  ANTHROPIC_API_KEY    - Anthropic API key (for summarization)
+  OPENAI_API_KEY       - OpenAI API key (transcription and summarization)
   GMAIL_ADDRESS        - Gmail address to send from
   GMAIL_APP_PASSWORD   - Gmail app password (not your normal password)
   DIGEST_TO_EMAIL      - Where the digest should be sent
@@ -28,7 +27,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
 
-import anthropic
 import feedparser
 import requests
 from dotenv import load_dotenv
@@ -45,14 +43,13 @@ RUNS_DIR = BASE_DIR / "runs"
 TRANSCRIPTION_MAX_BYTES = 24 * 1024 * 1024  # stay safely under the 25MB API limit
 CHUNK_MS = 10 * 60 * 1000                   # split long episodes into 10-minute chunks
 MAX_NEW_EPISODES_PER_SHOW = 3               # safety cap per run, per show
-MAX_TRANSCRIPT_CHARS = 400_000              # well under Sonnet 5's 1M token context window
+MAX_TRANSCRIPT_CHARS = 400_000              # well under Luna's ~1M token context window
 MIN_FEED_TRANSCRIPT_CHARS = 500             # below this, treat a feed transcript as bogus/placeholder
 TRANSCRIPTION_MODEL = "gpt-transcribe"
-SUMMARY_MODEL = "claude-sonnet-5"
+SUMMARY_MODEL = "gpt-5.6-luna"
 SUPPORTED_FEED_TRANSCRIPT_TYPES = {"text/plain", "text/vtt", "application/srt", "text/srt"}
 
 openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-anthropic_client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
 
 def load_json(path, default):
@@ -196,19 +193,20 @@ Keep bullets scannable. Plain text, no markdown headers."""
 
 
 def summarize_transcript(prompt):
-    response = anthropic_client.messages.create(
+    response = openai_client.chat.completions.create(
         model=SUMMARY_MODEL,
-        max_tokens=16000,
-        output_config={"effort": "low"},  # this is synthesis, not hard reasoning — adaptive
-                                            # thinking is on by default on this model, and a
-                                            # higher effort can burn tokens on internal thinking
-                                            # instead of visible output (same failure mode we
-                                            # hit with GPT-5.6 Luna's reasoning_effort)
+        max_completion_tokens=4000,
+        reasoning_effort="low",  # this is synthesis, not multi-step reasoning — "medium" (the
+                                  # default) burns the entire token budget on internal reasoning
+                                  # and returns empty content on open-ended prompts
         messages=[{"role": "user", "content": prompt}],
     )
-    summary = "".join(block.text for block in response.content if block.type == "text")
+    summary = response.choices[0].message.content
     if not summary:
-        raise RuntimeError(f"Empty summary from {SUMMARY_MODEL} (stop_reason={response.stop_reason})")
+        raise RuntimeError(
+            f"Empty summary from {SUMMARY_MODEL} (finish_reason={response.choices[0].finish_reason}, "
+            f"reasoning_tokens={response.usage.completion_tokens_details.reasoning_tokens})"
+        )
     return summary
 
 

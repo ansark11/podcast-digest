@@ -3,7 +3,7 @@
 Daily pipeline that checks a fixed list of podcasts for new episodes,
 transcribes them (using the feed's own published transcript when one is
 freely available, otherwise OpenAI's gpt-transcribe), summarizes them
-into key points (Claude Sonnet 5), and emails you a digest. Runs
+into key points (GPT-5.6 Luna), and emails you a digest. Runs
 automatically on GitHub Actions — no server or laptop needs to stay on.
 
 **Note:** this only works for shows with a public RSS feed. Spotify
@@ -28,8 +28,7 @@ shows:
 ```
 
 ### 3. Get your API keys
-- **OpenAI API key** (for transcription): platform.openai.com → API keys
-- **Anthropic API key** (for summarization): console.anthropic.com → API keys
+- **OpenAI API key** (for transcription and summarization): platform.openai.com → API keys
 - **Gmail app password** (for sending the email): Google Account →
   Security → 2-Step Verification → App passwords. Generate one for "Mail".
   (Your normal Gmail password won't work here — Google requires an app
@@ -43,7 +42,6 @@ Add each of these:
 | Secret name | Value |
 |---|---|
 | `OPENAI_API_KEY` | your OpenAI key |
-| `ANTHROPIC_API_KEY` | your Anthropic key |
 | `GMAIL_ADDRESS` | the Gmail address to send from |
 | `GMAIL_APP_PASSWORD` | the app password from step 3 |
 | `DIGEST_TO_EMAIL` | where the digest should be sent (can be the same address) |
@@ -70,8 +68,8 @@ Artifacts) since the runner's filesystem doesn't persist between runs.
 # for new episodes (real transcription/summarization cost applies):
 python scripts/backfill_runs.py --count 12
 
-# Automated LLM-as-judge pass (Claude Opus 5 — a different vendor and
-# model from the Sonnet 5 summarizer, so this isn't self-grading).
+# Automated LLM-as-judge pass. JUDGE_MODEL must stay a different model
+# from the summarizer — a judge grading its own family inflates scores.
 # The judge reports *what* is wrong (hallucinations, distortions,
 # missed topics, flagged terms) and how severe each item is; the 1-5
 # scores are then derived from that evidence in code, not assigned by
@@ -100,7 +98,7 @@ not part of the production digest pipeline.
    transcribed with gpt-transcribe (chunked automatically if over the
    25MB API limit), using the show/episode name as context to improve
    accuracy on names and terms
-4. Each transcript is summarized with Claude Sonnet 5; if anything new
+4. Each transcript is summarized with GPT-5.6 Luna; if anything new
    was found, one digest email is sent covering all of it
 5. `state/seen_episodes.json` is updated and committed back to the repo,
    so the same episode is never processed twice
@@ -108,9 +106,9 @@ not part of the production digest pipeline.
 ## Costs
 gpt-transcribe is about $0.0045/minute of audio (only charged when a
 show doesn't already publish a usable transcript). A handful of
-~45-minute episodes per week runs a couple dollars a month. Claude
-Sonnet 5 summarization ($2/$10 per million input/output tokens) runs a
-few cents per episode depending on transcript length.
+~45-minute episodes per week runs a couple dollars a month — transcription
+is ~97% of total spend. GPT-5.6 Luna summarization ($0.20/$1.20 per million
+input/output tokens) is under a cent per episode.
 
 ## Local testing
 ```bash
