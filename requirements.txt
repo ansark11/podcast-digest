@@ -1,6 +1,7 @@
 feedparser
 requests
 openai
+anthropic
 pydub
 python-dotenv
 audioop-lts; python_version >= "3.13"
