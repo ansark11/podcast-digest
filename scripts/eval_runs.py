@@ -16,7 +16,9 @@ Two layers of judgment on the same data:
           human scores across every evaluated episode.
 
 Usage:
-  python scripts/eval_runs.py judge [--force]
+  python scripts/eval_runs.py judge [--force]           # one call per run
+  python scripts/eval_runs.py judge --batch [--force]   # one batch, 50% cheaper, async
+  python scripts/eval_runs.py judge-collect <batch id>  # resume an interrupted batch
   python scripts/eval_runs.py review
   python scripts/eval_runs.py report
 """
@@ -27,6 +29,8 @@ import os
 import time
 
 import anthropic
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from anthropic.types.messages.batch_create_params import Request
 
 import podcast_digest as pd
 
@@ -78,6 +82,7 @@ Report problems in four lists. Do NOT assign any numeric scores — scores are c
 4. flagged_terms — names, companies, or technical terms that are wrong or unsupported. For each, set "kind":
    - "contradicted": the transcript says something different (e.g. a misspelled name)
    - "absent": the term may be true in the real world but never appears in the transcript
+   The transcript is machine-generated and can mishear names. The episode title comes from the publisher and is authoritative — if a name matches the episode title but not the transcript, it is CORRECT; do not flag it. Check names against the title first, and against the transcript only for terms the title doesn't cover.
 
 CATEGORY RULES — each problem belongs in exactly one list:
 - A wrong or unsupported name/entity goes ONLY in flagged_terms, never also in hallucinations.
@@ -235,22 +240,34 @@ def derive_proper_nouns(result):
     return 5
 
 
-def run_judge_scores(model, show, title, transcript, summary):
-    prompt = JUDGE_PROMPT.format(
-        show=show,
-        title=title,
-        transcript=transcript[:pd.MAX_TRANSCRIPT_CHARS],
-        summary=summary,
+def build_judge_prompt(run):
+    return JUDGE_PROMPT.format(
+        show=run["show"],
+        title=run["episode_title"],
+        transcript=run["transcript"][:pd.MAX_TRANSCRIPT_CHARS],
+        summary=run["summary"],
     )
-    result = call_llm_json(model, prompt)
+
+
+def score_from_evidence(result):
+    """Validate, dedupe, then derive every score from the judge's evidence.
+
+    Shared by the sync and batch paths so both produce identical records.
+    """
     _validate_evidence(result)
     _dedupe_evidence(result)
-
     result["faithfulness"] = derive_faithfulness(result)
     result["coverage"] = derive_coverage(result)
     result["proper_noun_accuracy"] = derive_proper_nouns(result)
     result["overall"] = compute_overall(result)
     return result
+
+
+def run_judge_scores(model, show, title, transcript, summary):
+    prompt = build_judge_prompt(
+        {"show": show, "episode_title": title, "transcript": transcript, "summary": summary}
+    )
+    return score_from_evidence(call_llm_json(model, prompt))
 
 
 def compute_overall(scores):
@@ -262,10 +279,7 @@ def compute_overall(scores):
     )
 
 
-def judge_run(run_path):
-    run = json.loads(run_path.read_text())
-    judge_result = run_judge_scores(JUDGE_MODEL, run["show"], run["episode_title"], run["transcript"], run["summary"])
-
+def build_eval_record(run_path, run, judge_result):
     return {
         "run_file": run_path.name,
         "show": run["show"],
@@ -277,16 +291,34 @@ def judge_run(run_path):
     }
 
 
-def cmd_judge(force):
+def save_eval(eval_path, eval_data):
+    """Write an eval, carrying any existing human review across a re-judge."""
+    if eval_path.exists():
+        existing = json.loads(eval_path.read_text())
+        eval_data["human_review"] = existing.get("human_review", eval_data["human_review"])
+    pd.save_json(eval_path, eval_data)
+
+
+def judge_run(run_path):
+    run = json.loads(run_path.read_text())
+    judge_result = run_judge_scores(JUDGE_MODEL, run["show"], run["episode_title"], run["transcript"], run["summary"])
+    return build_eval_record(run_path, run, judge_result)
+
+
+def pending_runs(force):
     run_files = sorted(pd.RUNS_DIR.glob("*.json"))
+    if not force:
+        run_files = [p for p in run_files if not (EVALS_DIR / p.name).exists()]
+    return run_files
+
+
+def cmd_judge(force):
+    run_files = pending_runs(force)
     if not run_files:
-        print(f"No run artifacts found in {pd.RUNS_DIR}. Run the pipeline or backfill_runs.py first.")
+        print(f"Nothing to judge in {pd.RUNS_DIR} (use --force to re-judge).")
         return
 
     for run_path in run_files:
-        eval_path = EVALS_DIR / run_path.name
-        if eval_path.exists() and not force:
-            continue
         print(f"Judging: {run_path.stem}")
         try:
             eval_data = judge_run(run_path)
@@ -294,15 +326,110 @@ def cmd_judge(force):
             print(f"  Failed: {e}")
             continue
 
-        if eval_path.exists() and force:
-            # Preserve any existing human review across a re-judge
-            existing = json.loads(eval_path.read_text())
-            eval_data["human_review"] = existing.get("human_review", eval_data["human_review"])
-
-        pd.save_json(eval_path, eval_data)
+        eval_path = EVALS_DIR / run_path.name
+        save_eval(eval_path, eval_data)
         j = eval_data["judge"]
         print(f"  faithfulness={j['faithfulness']} coverage={j['coverage']} "
               f"proper_nouns={j['proper_noun_accuracy']} overall={j['overall']}")
+
+
+def _batch_manifest_path(batch_id):
+    return EVALS_DIR / f"_batch_{batch_id}.json"
+
+
+def cmd_judge_batch(force, poll_seconds):
+    """Submit all pending runs as one Anthropic batch — 50% of standard pricing.
+
+    Judging is never latency-sensitive (summaries already exist), so the async
+    tradeoff is free here. The batch id and its custom_id -> run file mapping are
+    written to disk immediately after submit, so an interrupted poll can be
+    resumed with `judge-collect <batch id>` rather than re-paying for the batch.
+    """
+    if not JUDGE_MODEL.startswith("claude"):
+        raise SystemExit(f"Batch judging uses the Anthropic Batches API, but JUDGE_MODEL is {JUDGE_MODEL!r}.")
+
+    run_files = pending_runs(force)
+    if not run_files:
+        print(f"Nothing to judge in {pd.RUNS_DIR} (use --force to re-judge).")
+        return
+
+    requests, mapping = [], {}
+    for i, run_path in enumerate(run_files):
+        custom_id = f"run-{i}"
+        mapping[custom_id] = run_path.name
+        requests.append(
+            Request(
+                custom_id=custom_id,
+                params=MessageCreateParamsNonStreaming(
+                    model=JUDGE_MODEL,
+                    max_tokens=2500,
+                    output_config={"effort": "low"},
+                    messages=[{"role": "user", "content": build_judge_prompt(json.loads(run_path.read_text()))}],
+                ),
+            )
+        )
+
+    batch = _get_anthropic_client().messages.batches.create(requests=requests)
+    pd.save_json(_batch_manifest_path(batch.id), {"batch_id": batch.id, "mapping": mapping})
+    print(f"Submitted batch {batch.id} with {len(requests)} request(s).")
+    print(f"Manifest: {_batch_manifest_path(batch.id).relative_to(pd.BASE_DIR)}")
+    print("Most batches finish within an hour (24h max). Ctrl+C is safe — resume with:")
+    print(f"  python scripts/eval_runs.py judge-collect {batch.id}")
+
+    _poll_batch(batch.id, poll_seconds)
+    cmd_judge_collect(batch.id)
+
+
+def _poll_batch(batch_id, poll_seconds):
+    client = _get_anthropic_client()
+    while True:
+        batch = client.messages.batches.retrieve(batch_id)
+        if batch.processing_status == "ended":
+            counts = batch.request_counts
+            print(f"Batch ended — succeeded={counts.succeeded} errored={counts.errored} "
+                  f"canceled={counts.canceled} expired={counts.expired}")
+            return
+        print(f"  status={batch.processing_status} processing={batch.request_counts.processing}")
+        time.sleep(poll_seconds)
+
+
+def cmd_judge_collect(batch_id):
+    """Write evals from a finished batch. Results arrive in any order, so every
+    result is keyed back to its run file by custom_id, never by position."""
+    manifest_path = _batch_manifest_path(batch_id)
+    if not manifest_path.exists():
+        raise SystemExit(f"No manifest for batch {batch_id} at {manifest_path}")
+    mapping = json.loads(manifest_path.read_text())["mapping"]
+
+    written = failed = 0
+    for result in _get_anthropic_client().messages.batches.results(batch_id):
+        run_name = mapping.get(result.custom_id)
+        if run_name is None:
+            print(f"  {result.custom_id}: not in manifest, skipping")
+            continue
+
+        if result.result.type != "succeeded":
+            print(f"  {run_name}: {result.result.type}")
+            failed += 1
+            continue
+
+        text = "".join(b.text for b in result.result.message.content if b.type == "text")
+        run_path = pd.RUNS_DIR / run_name
+        try:
+            judge_result = score_from_evidence(json.loads(_extract_json(text)))
+        except Exception as e:
+            print(f"  {run_name}: unusable response — {e}")
+            failed += 1
+            continue
+
+        run = json.loads(run_path.read_text())
+        save_eval(EVALS_DIR / run_name, build_eval_record(run_path, run, judge_result))
+        j = judge_result
+        print(f"  {run_path.stem[:58]} faith={j['faithfulness']} cover={j['coverage']} "
+              f"nouns={j['proper_noun_accuracy']} overall={j['overall']}")
+        written += 1
+
+    print(f"Wrote {written} eval(s), {failed} failed.")
 
 
 def cmd_review():
@@ -393,6 +520,13 @@ if __name__ == "__main__":
 
     judge_parser = sub.add_parser("judge", help="Run automated LLM-as-judge scoring on new runs")
     judge_parser.add_argument("--force", action="store_true", help="Re-judge runs that already have an eval")
+    judge_parser.add_argument("--batch", action="store_true",
+                              help="Submit as one Anthropic batch at 50%% of standard pricing (async)")
+    judge_parser.add_argument("--poll-seconds", type=int, default=60,
+                              help="Seconds between batch status checks (default 60)")
+
+    collect_parser = sub.add_parser("judge-collect", help="Write evals from an already-submitted batch")
+    collect_parser.add_argument("batch_id")
 
     sub.add_parser("review", help="Interactively record your own score for judged episodes")
     sub.add_parser("report", help="Print and save a summary table of judge vs. human scores")
@@ -401,7 +535,12 @@ if __name__ == "__main__":
     EVALS_DIR.mkdir(parents=True, exist_ok=True)
 
     if args.command == "judge":
-        cmd_judge(args.force)
+        if args.batch:
+            cmd_judge_batch(args.force, args.poll_seconds)
+        else:
+            cmd_judge(args.force)
+    elif args.command == "judge-collect":
+        cmd_judge_collect(args.batch_id)
     elif args.command == "review":
         cmd_review()
     elif args.command == "report":

@@ -187,8 +187,9 @@ cover something, leave it out rather than filling the gap."""
 PRECISION_GUIDANCE = """Represent claims the way they were actually made:
 - Keep the speaker's level of certainty. If someone said something might work, or
   that they weren't sure, don't restate it as settled fact.
-- Attribute correctly. Name who made a claim where it matters, and don't fold the
-  host's framing or another guest's point into the main guest's position.
+- Don't misattribute. Where it's genuinely ambiguous who said something, or where
+  the host and guest disagree, make the speaker clear — but don't add names where
+  the attribution is already obvious from context.
 - Keep qualifiers attached to what they modify. Don't drop a caveat that changes
   what a statement means.
 
@@ -196,10 +197,12 @@ This is about representing the conversation precisely, not about hedging your ow
 writing. Write plainly and directly — don't pad the summary with "reportedly" or
 "seemingly" to play it safe."""
 
-NAMING_GUIDANCE = """Use names, companies, and technical terms exactly as they appear
-in the transcript. If a name is spelled a certain way there, use that spelling even
-if you believe the real-world spelling differs. If someone is only ever referred to
-by first name, don't supply a surname."""
+NAMING_GUIDANCE = """For names, companies, and technical terms, follow the episode
+title's spelling for anything that appears there — the title comes from the
+publisher and is authoritative. The transcript is machine-generated and can
+mishear names, so use it only for terms the title doesn't cover. If someone is
+only ever referred to by first name, use just the first name — don't supply a
+surname."""
 
 
 def build_summary_prompt(show_name, episode_title, transcript):
@@ -230,7 +233,12 @@ Write:
 
 {NAMING_GUIDANCE}
 
-Keep bullets scannable. Plain text, no markdown headers."""
+Keep bullets scannable. Plain text, no markdown headers.
+
+Aim for roughly 400-800 words overall — this is a digest someone reads in a couple
+of minutes, not a transcript. If the episode covers a lot of ground, still cover
+all of it but tighten each bullet. Don't drop topics to hit the range, and don't
+pad to reach it."""
 
 
 def summarize_transcript(prompt):
