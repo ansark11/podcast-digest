@@ -166,12 +166,52 @@ def transcribe_audio(file_path, context=None):
     return " ".join(transcript_parts)
 
 
+# The guidance blocks below are composed into one prompt by
+# build_summary_prompt(). They're kept separate so a change to one concern can
+# be diffed, and so a score movement in the eval harness can be attributed to
+# a specific block. Each targets a failure mode the judge scores for, but they
+# describe how to write — deliberately not how output gets graded, since the
+# cheapest way to score well on "faithfulness" is to hedge everything into mush.
+
+COVERAGE_GUIDANCE = """Cover every major topic or question the episode actually
+   discusses. Do not compress a wide-ranging conversation down to a fixed number
+   of bullets — a dense episode covering many distinct topics should get more
+   bullets than a narrow, single-topic one. Keep each bullet to 1-2 sentences,
+   but do not drop a distinct topic just to keep the list short."""
+
+GROUNDING_GUIDANCE = """Include only what the episode actually contains. Do not add
+advice, industry context, definitions, or conclusions the speakers did not state
+themselves, even where they would be accurate or useful. If the episode doesn't
+cover something, leave it out rather than filling the gap."""
+
+PRECISION_GUIDANCE = """Represent claims the way they were actually made:
+- Keep the speaker's level of certainty. If someone said something might work, or
+  that they weren't sure, don't restate it as settled fact.
+- Attribute correctly. Name who made a claim where it matters, and don't fold the
+  host's framing or another guest's point into the main guest's position.
+- Keep qualifiers attached to what they modify. Don't drop a caveat that changes
+  what a statement means.
+
+This is about representing the conversation precisely, not about hedging your own
+writing. Write plainly and directly — don't pad the summary with "reportedly" or
+"seemingly" to play it safe."""
+
+NAMING_GUIDANCE = """Use names, companies, and technical terms exactly as they appear
+in the transcript. If a name is spelled a certain way there, use that spelling even
+if you believe the real-world spelling differs. If someone is only ever referred to
+by first name, don't supply a surname."""
+
+
 def build_summary_prompt(show_name, episode_title, transcript):
     if len(transcript) > MAX_TRANSCRIPT_CHARS:
         print(f"  Warning: transcript is {len(transcript)} chars, truncating to {MAX_TRANSCRIPT_CHARS} for summarization")
         transcript = transcript[:MAX_TRANSCRIPT_CHARS]
 
-    return f"""You're summarizing a podcast episode for a personal digest email.
+    # Guidance sits after the transcript on purpose: with ~20k tokens of
+    # transcript, instructions placed before it are likelier to be lost.
+    return f"""You're summarizing a podcast episode for a personal digest email. The
+reader is relying on this instead of listening, so it has to be both complete and
+accurate about what was actually said.
 
 Show: {show_name}
 Episode: {episode_title}
@@ -181,13 +221,14 @@ Transcript:
 
 Write:
 1. A 2-3 sentence overview
-2. Bullet-point key takeaways covering every major topic or question the
-   episode actually discusses. Do not compress a wide-ranging conversation
-   down to a fixed number of bullets — a dense episode covering many
-   distinct topics should get more bullets than a narrow, single-topic one.
-   Keep each bullet to 1-2 sentences, but do not drop a distinct topic just
-   to keep the list short.
+2. Bullet-point key takeaways. {COVERAGE_GUIDANCE}
 3. Any notable quotes or resources mentioned (if any)
+
+{GROUNDING_GUIDANCE}
+
+{PRECISION_GUIDANCE}
+
+{NAMING_GUIDANCE}
 
 Keep bullets scannable. Plain text, no markdown headers."""
 
