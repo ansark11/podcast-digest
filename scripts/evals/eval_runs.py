@@ -1,5 +1,12 @@
 """
-Eval harness for runs/ artifacts produced by podcast_digest.py.
+Eval harness for experimental summaries in evals/runs/.
+
+Eval runs are kept apart from the production summaries/ the app reads.
+They're organized by prompt version, one folder per take:
+  evals/runs/<tag>/<file>.json      full record: transcript, prompt, summary
+  evals/results/<tag>/<file>.json   judge + human scores for that run
+  evals/reports/report.md           comparison table
+Create a new take with scripts/evals/resummarize.py --tag <tag>.
 
 Two layers of judgment on the same data:
   judge   Automated LLM-as-judge pass. JUDGE_MODEL must stay a different
@@ -12,29 +19,38 @@ Two layers of judgment on the same data:
   review  Interactive human scoring — walks through judged runs missing a
           human rating and records your own 1-5 score + notes, so you can
           calibrate yourself against the judge.
-  report  Prints (and writes evals/report.md) a table comparing judge and
-          human scores across every evaluated episode.
+  report  Prints (and writes evals/reports/report.md) a table comparing
+          judge and human scores across every evaluated episode.
 
 Usage:
-  python scripts/eval_runs.py judge [--force]           # one call per run
-  python scripts/eval_runs.py judge --batch [--force]   # one batch, 50% cheaper, async
-  python scripts/eval_runs.py judge-collect <batch id>  # resume an interrupted batch
-  python scripts/eval_runs.py review
-  python scripts/eval_runs.py report
+  python scripts/evals/eval_runs.py judge [--force]           # one call per run
+  python scripts/evals/eval_runs.py judge --batch [--force]   # one batch, 50% cheaper, async
+  python scripts/evals/eval_runs.py judge-collect <batch id>  # resume an interrupted batch
+  python scripts/evals/eval_runs.py review
+  python scripts/evals/eval_runs.py report
+
+Folders whose name starts with "_" (e.g. evals/results/_archive) are ignored.
 """
 
 import argparse
 import json
 import os
+import sys
 import time
+from pathlib import Path
 
 import anthropic
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from anthropic.types.messages.batch_create_params import Request
 
-import podcast_digest as pd
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import podcast_digest as pd  # noqa: E402
 
 EVALS_DIR = pd.BASE_DIR / "evals"
+EVAL_RUNS_DIR = EVALS_DIR / "runs"
+RESULTS_DIR = EVALS_DIR / "results"
+REPORTS_DIR = EVALS_DIR / "reports"
+BATCHES_DIR = RESULTS_DIR / "_batches"
 JUDGE_MODEL = "claude-opus-5"
 
 # Built lazily: the judge only needs an Anthropic key when JUDGE_MODEL is a
@@ -137,7 +153,7 @@ def call_llm_json(model, prompt, max_tokens=2500):
             raise RuntimeError(f"Empty judge response from {model} (stop_reason={response.stop_reason})")
         return json.loads(_extract_json(text))
     else:
-        response = pd.openai_client.chat.completions.create(
+        response = pd.get_openai_client().chat.completions.create(
             model=model,
             max_completion_tokens=max_tokens,
             reasoning_effort="low",
@@ -279,9 +295,35 @@ def compute_overall(scores):
     )
 
 
+def _eval_json_files(root):
+    """Every .json under root, skipping any folder whose name starts with "_"."""
+    if not root.exists():
+        return []
+    return sorted(
+        p for p in root.rglob("*.json")
+        if not any(part.startswith("_") for part in p.relative_to(root).parts[:-1])
+    )
+
+
+def run_key(run_path):
+    """A run's path relative to evals/runs/, e.g. "v4/<file>.json". Its result
+    lives at the same relative path under evals/results/."""
+    return run_path.relative_to(EVAL_RUNS_DIR).as_posix()
+
+
+def _display_title(eval_data):
+    """"[tag] title" — tag from the run's folder. Older runs already carry the
+    tag in the title itself, so strip that first to avoid doubling it."""
+    title = eval_data["episode_title"]
+    if title.startswith("[") and "] " in title:
+        title = title.split("] ", 1)[1]
+    parts = eval_data["run_file"].split("/")
+    return f"[{parts[0]}] {title}" if len(parts) > 1 else title
+
+
 def build_eval_record(run_path, run, judge_result):
     return {
-        "run_file": run_path.name,
+        "run_file": run_key(run_path),
         "show": run["show"],
         "episode_title": run["episode_title"],
         "judge_model": JUDGE_MODEL,
@@ -306,27 +348,27 @@ def judge_run(run_path):
 
 
 def pending_runs(force):
-    run_files = sorted(pd.RUNS_DIR.glob("*.json"))
+    run_files = _eval_json_files(EVAL_RUNS_DIR)
     if not force:
-        run_files = [p for p in run_files if not (EVALS_DIR / p.name).exists()]
+        run_files = [p for p in run_files if not (RESULTS_DIR / run_key(p)).exists()]
     return run_files
 
 
 def cmd_judge(force):
     run_files = pending_runs(force)
     if not run_files:
-        print(f"Nothing to judge in {pd.RUNS_DIR} (use --force to re-judge).")
+        print(f"Nothing to judge in {EVAL_RUNS_DIR} (use --force to re-judge).")
         return
 
     for run_path in run_files:
-        print(f"Judging: {run_path.stem}")
+        print(f"Judging: {run_key(run_path)}")
         try:
             eval_data = judge_run(run_path)
         except Exception as e:
             print(f"  Failed: {e}")
             continue
 
-        eval_path = EVALS_DIR / run_path.name
+        eval_path = RESULTS_DIR / run_key(run_path)
         save_eval(eval_path, eval_data)
         j = eval_data["judge"]
         print(f"  faithfulness={j['faithfulness']} coverage={j['coverage']} "
@@ -334,7 +376,7 @@ def cmd_judge(force):
 
 
 def _batch_manifest_path(batch_id):
-    return EVALS_DIR / f"_batch_{batch_id}.json"
+    return BATCHES_DIR / f"{batch_id}.json"
 
 
 def cmd_judge_batch(force, poll_seconds):
@@ -350,13 +392,13 @@ def cmd_judge_batch(force, poll_seconds):
 
     run_files = pending_runs(force)
     if not run_files:
-        print(f"Nothing to judge in {pd.RUNS_DIR} (use --force to re-judge).")
+        print(f"Nothing to judge in {EVAL_RUNS_DIR} (use --force to re-judge).")
         return
 
     requests, mapping = [], {}
     for i, run_path in enumerate(run_files):
         custom_id = f"run-{i}"
-        mapping[custom_id] = run_path.name
+        mapping[custom_id] = run_key(run_path)
         requests.append(
             Request(
                 custom_id=custom_id,
@@ -374,7 +416,7 @@ def cmd_judge_batch(force, poll_seconds):
     print(f"Submitted batch {batch.id} with {len(requests)} request(s).")
     print(f"Manifest: {_batch_manifest_path(batch.id).relative_to(pd.BASE_DIR)}")
     print("Most batches finish within an hour (24h max). Ctrl+C is safe — resume with:")
-    print(f"  python scripts/eval_runs.py judge-collect {batch.id}")
+    print(f"  python scripts/evals/eval_runs.py judge-collect {batch.id}")
 
     _poll_batch(batch.id, poll_seconds)
     cmd_judge_collect(batch.id)
@@ -414,7 +456,7 @@ def cmd_judge_collect(batch_id):
             continue
 
         text = "".join(b.text for b in result.result.message.content if b.type == "text")
-        run_path = pd.RUNS_DIR / run_name
+        run_path = EVAL_RUNS_DIR / run_name
         try:
             judge_result = score_from_evidence(json.loads(_extract_json(text)))
         except Exception as e:
@@ -423,9 +465,9 @@ def cmd_judge_collect(batch_id):
             continue
 
         run = json.loads(run_path.read_text())
-        save_eval(EVALS_DIR / run_name, build_eval_record(run_path, run, judge_result))
+        save_eval(RESULTS_DIR / run_name, build_eval_record(run_path, run, judge_result))
         j = judge_result
-        print(f"  {run_path.stem[:58]} faith={j['faithfulness']} cover={j['coverage']} "
+        print(f"  {run_name[:58]} faith={j['faithfulness']} cover={j['coverage']} "
               f"nouns={j['proper_noun_accuracy']} overall={j['overall']}")
         written += 1
 
@@ -433,7 +475,7 @@ def cmd_judge_collect(batch_id):
 
 
 def cmd_review():
-    eval_files = sorted(EVALS_DIR.glob("*.json"))
+    eval_files = _eval_json_files(RESULTS_DIR)
     pending = [f for f in eval_files if json.loads(f.read_text())["human_review"]["overall"] is None]
 
     if not pending:
@@ -443,11 +485,11 @@ def cmd_review():
     print(f"{len(pending)} episode(s) to review. Ctrl+C any time — progress is saved as you go.\n")
     for eval_path in pending:
         eval_data = json.loads(eval_path.read_text())
-        run_data = json.loads((pd.RUNS_DIR / eval_data["run_file"]).read_text())
+        run_data = json.loads((EVAL_RUNS_DIR / eval_data["run_file"]).read_text())
         j = eval_data["judge"]
 
         print("=" * 70)
-        print(f"{eval_data['show']} — {eval_data['episode_title']}")
+        print(f"{eval_data['show']} — {_display_title(eval_data)}")
         print("-" * 70)
         print(f"SUMMARY:\n{run_data['summary']}\n")
         print(f"JUDGE: faithfulness={j['faithfulness']} coverage={j['coverage']} "
@@ -457,7 +499,7 @@ def cmd_review():
                 kind = f", {entry['kind']}" if "kind" in entry else ""
                 print(f"  [{name} · {entry['severity']}{kind}] {entry['item']}")
         print(f"  Rationale: {j['rationale']}")
-        print(f"\n(Full transcript is in runs/{eval_data['run_file']} if you want to check it directly.)")
+        print(f"\n(Full transcript is in evals/runs/{eval_data['run_file']} if you want to check it directly.)")
 
         try:
             raw_score = input("\nYour score 1-5 (blank to skip): ").strip()
@@ -479,7 +521,7 @@ def cmd_review():
 
 
 def cmd_report():
-    eval_files = sorted(EVALS_DIR.glob("*.json"))
+    eval_files = _eval_json_files(RESULTS_DIR)
     if not eval_files:
         print("No evals yet — run 'judge' first.")
         return
@@ -490,7 +532,7 @@ def cmd_report():
         j = d["judge"]
         h = d["human_review"]
         rows.append((
-            d["episode_title"][:45],
+            _display_title(d)[:45],
             j["faithfulness"], j["coverage"], j["proper_noun_accuracy"], j["overall"],
             h["overall"] if h["overall"] is not None else "-",
             sum(len(j.get(name, [])) for name in EVIDENCE_LISTS),
@@ -509,7 +551,8 @@ def cmd_report():
                 "|---|---|---|---|---|---|---|"]
     for r in rows:
         md_lines.append(f"| {r[0]} | {r[1]} | {r[2]} | {r[3]} | {r[4]} | {r[5]} | {r[6]} |")
-    report_path = EVALS_DIR / "report.md"
+    report_path = REPORTS_DIR / "report.md"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text("\n".join(md_lines))
     print(f"\nWritten to {report_path.relative_to(pd.BASE_DIR)}")
 
@@ -532,7 +575,7 @@ if __name__ == "__main__":
     sub.add_parser("report", help="Print and save a summary table of judge vs. human scores")
 
     args = parser.parse_args()
-    EVALS_DIR.mkdir(parents=True, exist_ok=True)
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     if args.command == "judge":
         if args.batch:

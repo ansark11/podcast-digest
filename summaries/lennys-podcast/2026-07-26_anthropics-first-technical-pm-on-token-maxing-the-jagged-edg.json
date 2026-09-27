@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "guid": "substack:post:207214207",
+  "show": "Lenny's Podcast",
+  "show_slug": "lennys-podcast",
+  "episode_title": "Anthropic\u2019s first technical PM on token maxing, the jagged edge, and living in the future | Dianne Penn",
+  "published": "2026-07-26T12:32:06+00:00",
+  "audio_url": "https://pscrb.fm/rss/p/api.substack.com/feed/podcast/207214207/aaa7067cd960f0369661f0976cbe3d0a.mp3",
+  "episode_url": null,
+  "artwork_url": null,
+  "description_html": null,
+  "duration_seconds": null,
+  "transcript_path": "transcripts/lennys-podcast/2026-07-26_anthropics-first-technical-pm-on-token-maxing-the-jagged-edg.txt",
+  "transcription_source": "gpt-transcribe",
+  "summary_model": "gpt-5.6-luna",
+  "prompt_version": "v4",
+  "generated_at": "2026-09-12T17:01:32-04:00",
+  "summary": {
+    "overview": "Anthropic\u2019s Dianne Penn reflects on the company\u2019s evolution from a small research lab into a major AI company, highlighting Opus 3, coding, Claude Code, and the Labs team as key inflection points. She explains how product management is changing around rapidly improving, unpredictable models: PMs need to be hands-on, use evals to translate user feedback into model improvements, and think about what users will do as future models become more capable.",
+    "takeaways": [
+      {
+        "heading": "Anthropic\u2019s early culture",
+        "detail": "Dianne joined in 2023, when Anthropic had roughly five product engineers and one engineer supporting the entire API business. She says the company\u2019s early startup energy, strong culture, and commitment to its mission have remained central as it has grown."
+      },
+      {
+        "heading": "Finding Anthropic\u2019s identity",
+        "detail": "An early example was \u201cGolden Gate Claude,\u201d a 24-hour experiment based on interpretability research. Turning up a \u201cGolden Gate Bridge\u201d feature caused Claude to mention the bridge in every response; although only about 2,000 people saw it, the project showed Anthropic could turn research into distinctive, playful user experiences quickly."
+      },
+      {
+        "heading": "Opus 3 and coding",
+        "detail": "Training Opus 3 was an important confidence-building moment for the company. Dianne also noticed users moving beyond autocomplete to having models write long-form code, leading Anthropic to make a relatively small training change that helped Claude differentiate itself with developers."
+      },
+      {
+        "heading": "The model-product relationship",
+        "detail": "She describes Opus 4.5 and Claude Code as mutually reinforcing: Opus 4.5 provided the intelligence needed for users to experience frontier capabilities in an agentic coding product, while Claude Code gave the model a vehicle through which that capability could reach users."
+      },
+      {
+        "heading": "Operating during an exponential",
+        "detail": "Dianne says exact capability jumps are difficult to predict, so adaptability and first-principles thinking are essential. Teams need to revisit plans when new model abilities emerge, bring forward work that is suddenly possible, and help users understand what has changed."
+      },
+      {
+        "heading": "Emergent capabilities and \u201coverhang\u201d",
+        "detail": "Scaling can produce discontinuous jumps in abilities, such as suddenly becoming reliable at a task the model previously could not do. This means models may acquire capabilities that teams are not initially aware of, making evals and experimentation important for discovering what is possible."
+      },
+      {
+        "heading": "Token maxing",
+        "detail": "Dianne agrees that using models extensively is valuable, but frames token spending as an input rather than the outcome. The important result is experimentation: Anthropic\u2019s strongest prototypers spend significant time with each new research model because there is no substitute for using the technology to develop good, then great, ideas."
+      },
+      {
+        "heading": "Experimentation as a group activity",
+        "detail": "Early Anthropic employees tested Claude in public Slack channels, sharing use cases and building on one another\u2019s experiments. Dianne believes communal discovery can be more productive and enjoyable than trying to discover every use case alone."
+      },
+      {
+        "heading": "What Labs does",
+        "detail": "Labs pursues discontinuous, large bets that may not fit the core roadmap, testing whether there is \u201ca there there\u201d and what a 10x, 100x, or 1,000x version might look like. Claude Code, Skills, Claude Design, and MCP are examples she mentions."
+      },
+      {
+        "heading": "Why Labs works",
+        "detail": "Small, self-directed teams, a culture of experimentation, strong leadership from Ben, and a willingness to shut down or revisit bets help Labs move quickly. Teams can hold strong opinions about a theme while remaining flexible about the exact prototype."
+      },
+      {
+        "heading": "What AI researchers do",
+        "detail": "Researchers work on both immediate model improvements and ambitious visions of what AI could eventually do, such as using computers. Dianne\u2019s product team translates vague feedback\u2014such as \u201cClaude hallucinated\u201d\u2014into specific, actionable problems involving tool use, search, knowledge, alignment, or other capabilities."
+      },
+      {
+        "heading": "Evals as \u201cthe new PRDs\u201d",
+        "detail": "For research product managers, user feedback is converted into reproducible examples and eval sets that researchers can use to measure improvement. Dianne gives schema-following and JSON output as an example: a vague complaint about instruction-following became a concrete set of test cases."
+      },
+      {
+        "heading": "PRDs still matter",
+        "detail": "Evals do not replace PRDs in every situation. PRDs remain useful for aligning large groups around models, goals, stakeholders, and ambiguous opportunities such as computer use."
+      },
+      {
+        "heading": "Skills for successful researchers and PMs",
+        "detail": "Dianne emphasizes first-principles reasoning, ambition, passion for a research area, attention to details such as training runs and evals, and the ability to question assumptions. PMs also need to understand users deeply and express their needs in a form that partner teams can act on."
+      },
+      {
+        "heading": "Hands-on product leadership",
+        "detail": "Managers and senior PMs should not merely tinker with AI; they should ship with it, read user feedback, and stay close to the changing capabilities. Dianne says Anthropic gives experienced hires the same hands-on onboarding expectations as early-career employees."
+      },
+      {
+        "heading": "Finding enjoyment in AI work",
+        "detail": "She recommends pairing with people who are excited about the technology and going deep on one or two tools rather than trying to keep up with everything. She also uses Claude to prepare for difficult management conversations, including through a custom skill inspired by Crucial Conversations."
+      },
+      {
+        "heading": "AI, judgment, and writing",
+        "detail": "Dianne advises forming one\u2019s own point of view before asking Claude to critique or extend it, so the model augments rather than replaces personal judgment. She says writing, tone, and character remain active areas for improvement, and that who verifies and signs off on AI-generated work may matter more than who wrote it."
+      },
+      {
+        "heading": "Human strengths and children\u2019s education",
+        "detail": "She expects judgment, persistence, proactivity, subject-matter expertise, and the ability to think ambitiously to remain valuable. For her children, she prioritizes curiosity, persistence, an inner voice, opinions, and an individual perspective."
+      },
+      {
+        "heading": "Avoiding burnout",
+        "detail": "Dianne says the pace is sustainable only through teamwork, shared ownership, and colleagues who step in to support one another. She describes Anthropic\u2019s culture as involving \u201cmind melding\u201d or entering a \u201chive mind,\u201d rather than carrying the responsibility alone."
+      },
+      {
+        "heading": "Her career lesson",
+        "detail": "From working as a high-yield bond trader at J.P. Morgan, Dianne learned to develop an authentic voice, have conviction in good ideas regardless of seniority or background, and follow through on the detailed work required to make them real."
+      }
+    ],
+    "quotes": [
+      {
+        "text": "Evals are the new PRDs.",
+        "speaker": null
+      },
+      {
+        "text": "You have to sweat the tokens as much as you sweat the pixels.",
+        "speaker": null
+      },
+      {
+        "text": "No matter how far you go, there\u2019s always another level.",
+        "speaker": null
+      },
+      {
+        "text": "Experimentation is not an individual sport.",
+        "speaker": null
+      }
+    ],
+    "resources": [
+      {
+        "name": "How to Raise an Adult by Julie Lythcott-Haims",
+        "kind": "book"
+      },
+      {
+        "name": "Incorruptible by Eric Ries",
+        "kind": "book"
+      },
+      {
+        "name": "Crucial Conversations",
+        "kind": "book"
+      },
+      {
+        "name": "Fallout",
+        "kind": "show"
+      }
+    ]
+  }
+}

@@ -2,5 +2,6 @@
 __pycache__/
 *.pyc
 .venv/
-runs/
-evals/
+.DS_Store
+# Experimental summaries, judge scores and reports. Local only.
+/evals/
