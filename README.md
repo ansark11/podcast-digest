@@ -62,11 +62,28 @@ config/shows.json          shows to follow (name + RSS feed)
 state/seen_episodes.json   episodes already processed
 summaries/<show>/*.json    one structured summary per episode (read by the web app)
 transcripts/<show>/*.txt   the transcript each summary was made from
+web/                       the reading app (Astro), deployed on Vercel
 scripts/
   podcast_digest.py        production pipeline (run daily by GitHub Actions)
   backfill.py              summarize older episodes into summaries/, no email
   evals/                   eval tooling, never writes to summaries/
 evals/                     gitignored: experimental takes, judge scores, reports
+```
+
+## Web app
+`web/` is an Astro site that turns every file in `summaries/` into a page:
+a library (search, unread markers, continue reading, saved) and a reading
+view per episode. It follows the device's light/dark setting. Reading
+progress and saves are stored in the browser, so they don't sync between
+devices.
+
+Vercel deploys it (project Root Directory: `web`) and rebuilds on every
+push, including the pipeline's daily commit, so new summaries appear on
+their own. To run it locally:
+```bash
+cd web
+npm install
+npm run dev      # http://localhost:4321
 ```
 
 ## Summary files

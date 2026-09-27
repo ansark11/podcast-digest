@@ -1,0 +1,211 @@
+---
+import Thumb from './Thumb.astro';
+import Icon from './Icon.astro';
+import { getEpisodes, splitTitle, guestName, formatDate, searchText } from '../lib/episodes';
+
+interface Props { mode: 'library' | 'saved'; }
+const { mode } = Astro.props;
+const episodes = await getEpisodes();
+const shows = [...new Set(episodes.map((e) => e.data.show))];
+---
+<section class="ep-list" data-mode={mode}>
+
+  {mode === 'library' && (
+    <section class="continue" aria-labelledby="continue-h" hidden data-continue>
+      <h2 id="continue-h" class="section-h">Continue reading</h2>
+      <div class="continue-grid">
+        {episodes.map((e) => {
+          const { headline, guest } = splitTitle(e.data.episode_title);
+          return (
+            <a class="continue-card" href={`/episodes/${e.id}`} data-id={e.id} hidden>
+              <Thumb episode={e} size={64} />
+              <span class="continue-body">
+                <span class="continue-title">{headline}</span>
+                <span class="muted small">{guestName(guest) ?? e.data.show}</span>
+                <span class="continue-bar"><span class="progress"><span data-bar style="width:0%"></span></span><span class="small muted" data-pct></span></span>
+              </span>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  )}
+
+  <section aria-labelledby="all-h" class="all">
+    <div class="all-head">
+      <h2 id="all-h" class="section-h">{mode === 'saved' ? 'Saved summaries' : 'All summaries'}</h2>
+      <div class="filters">
+        {mode === 'library' && (
+          <div class="chip-group" role="group" aria-label="Filter">
+            <button type="button" class="chip-btn" aria-pressed="true" data-filter="all">All</button>
+            <button type="button" class="chip-btn" aria-pressed="false" data-filter="unread">Unread</button>
+          </div>
+        )}
+        {shows.length > 1 && (
+          <div class="chip-group" role="group" aria-label="Show">
+            <button type="button" class="chip-btn" aria-pressed="true" data-show-filter="">All shows</button>
+            {shows.map((s) => <button type="button" class="chip-btn" aria-pressed="false" data-show-filter={s}>{s}</button>)}
+          </div>
+        )}
+        <button type="button" class="chip-btn sort" data-sort="newest" aria-label="Sort order">
+          <span data-sort-label>Newest</span><Icon name="chevron-down" size={14} />
+        </button>
+      </div>
+    </div>
+
+    <div class="rows card" data-rows>
+      {episodes.map((e) => {
+        const { headline, guest } = splitTitle(e.data.episode_title);
+        return (
+          <a class="row" href={`/episodes/${e.id}`} data-id={e.id} data-show={e.data.show}
+             data-date={e.data.published ?? ''} data-search={searchText(e)} hidden={mode === 'saved'}>
+            <Thumb episode={e} size={60} />
+            <span class="row-body">
+              <span class="row-title"><span class="unread-dot" data-unread hidden title="Unread"></span><span class="row-headline">{headline}</span></span>
+              <span class="muted small">{guest ?? e.data.show}</span>
+            </span>
+            <span class="pill row-pill">{e.data.summary.takeaways.length} takeaways</span>
+            <span class="row-date small muted">{formatDate(e.data.published)}</span>
+            <span class="row-chev"><Icon name="chevron-right" /></span>
+          </a>
+        );
+      })}
+      <p class="empty muted" data-empty hidden>
+        {mode === 'saved' ? 'Nothing saved yet. Use Save on any summary to keep it here.' : 'No summaries match.'}
+      </p>
+    </div>
+  </section>
+</section>
+
+<style>
+  .ep-list { display: flex; flex-direction: column; gap: 28px; }
+  .section-h { margin: 0; font-size: 18px; font-weight: 700; }
+  .small { font-size: 13px; }
+  .continue { display: flex; flex-direction: column; gap: 14px; }
+  .continue-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .continue-card { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--surface); border-radius: var(--radius-md); text-decoration: none; color: var(--text); }
+  .continue-card:hover { background: var(--surface-2); }
+  .continue-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  .continue-title { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .continue-bar { display: flex; align-items: center; gap: 10px; }
+  .all { display: flex; flex-direction: column; gap: 14px; }
+  .all-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .filters, .chip-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sort { display: inline-flex; align-items: center; gap: 6px; }
+  .rows { padding: 8px; display: flex; flex-direction: column; border-radius: 22px; }
+  .row { display: flex; align-items: center; gap: 18px; padding: 14px 16px; border-radius: 16px; text-decoration: none; color: var(--text); }
+  .row:hover { background: var(--surface-2); }
+  .row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .row-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; min-width: 0; }
+  .row-headline { overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warm); flex-shrink: 0; }
+  .row-date { width: 64px; text-align: right; white-space: nowrap; }
+  .row-chev { color: var(--faint); display: flex; }
+  .empty { margin: 0; padding: 28px 16px; text-align: center; }
+  @media (max-width: 900px) {
+    .continue-grid { grid-template-columns: minmax(0, 1fr); }
+    .row { gap: 14px; padding: 12px 10px; }
+    .row-pill, .row-chev { display: none; }
+    .row-headline { -webkit-line-clamp: 3; }
+    .row-date { width: auto; align-self: flex-start; }
+  }
+</style>
+
+<script>
+  import { load, IN_PROGRESS } from '../lib/store';
+
+  const root = document.querySelector<HTMLElement>('.ep-list');
+  if (root) {
+    const mode = root.dataset.mode;
+    const state = load();
+    const rowsBox = root.querySelector<HTMLElement>('[data-rows]')!;
+    const rows = [...root.querySelectorAll<HTMLAnchorElement>('.row')];
+    const empty = root.querySelector<HTMLElement>('[data-empty]')!;
+    const search = document.querySelector<HTMLInputElement>('[data-search-input]');
+    let filter = 'all';
+    let show = '';
+    let newestFirst = true;
+
+    // Unread markers
+    rows.forEach((r) => { r.querySelector<HTMLElement>('[data-unread]')!.hidden = !!state.opened[r.dataset.id!]; });
+
+    // Continue reading: started but unfinished, most recently opened first
+    const cont = root.querySelector<HTMLElement>('[data-continue]');
+    if (cont) {
+      const ids = Object.keys(state.progress)
+        .filter((id) => IN_PROGRESS(state.progress[id]))
+        .sort((a, b) => (state.opened[b] ?? 0) - (state.opened[a] ?? 0))
+        .slice(0, 2);
+      ids.forEach((id) => {
+        const card = cont.querySelector<HTMLElement>(`.continue-card[data-id="${CSS.escape(id)}"]`);
+        if (!card) return;
+        const pct = Math.round(state.progress[id] * 100);
+        card.querySelector<HTMLElement>('[data-bar]')!.style.width = `${pct}%`;
+        card.querySelector<HTMLElement>('[data-pct]')!.textContent = `${pct}%`;
+        card.hidden = false;
+        card.parentElement!.appendChild(card); // keep display order = recency
+      });
+      cont.hidden = ids.length === 0;
+    }
+
+    // Saved page keeps save order (most recent first)
+    if (mode === 'saved') {
+      state.saved.forEach((id) => {
+        const r = rows.find((x) => x.dataset.id === id);
+        if (r) rowsBox.insertBefore(r, empty);
+      });
+    }
+
+    function apply() {
+      const q = (search?.value ?? '').trim().toLowerCase();
+      const terms = q.split(/\s+/).filter(Boolean);
+      let shown = 0;
+      rows.forEach((r) => {
+        const id = r.dataset.id!;
+        const ok =
+          (mode !== 'saved' || state.saved.includes(id)) &&
+          (filter !== 'unread' || !state.opened[id]) &&
+          (!show || r.dataset.show === show) &&
+          terms.every((t) => r.dataset.search!.includes(t));
+        r.hidden = !ok;
+        if (ok) shown++;
+      });
+      empty.hidden = shown > 0;
+    }
+
+    function sortRows() {
+      if (mode === 'saved') return;
+      const sorted = [...rows].sort((a, b) => {
+        const c = (a.dataset.date ?? '').localeCompare(b.dataset.date ?? '');
+        return newestFirst ? -c : c;
+      });
+      sorted.forEach((r) => rowsBox.insertBefore(r, empty));
+    }
+
+    root.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) => b.addEventListener('click', () => {
+      filter = b.dataset.filter!;
+      root.querySelectorAll('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      apply();
+    }));
+    root.querySelectorAll<HTMLButtonElement>('[data-show-filter]').forEach((b) => b.addEventListener('click', () => {
+      show = b.dataset.showFilter!;
+      root.querySelectorAll('[data-show-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      apply();
+    }));
+    const sortBtn = root.querySelector<HTMLButtonElement>('[data-sort]');
+    if (mode === 'saved') sortBtn?.remove();
+    sortBtn?.addEventListener('click', () => {
+      newestFirst = !newestFirst;
+      sortBtn.querySelector('[data-sort-label]')!.textContent = newestFirst ? 'Newest' : 'Oldest';
+      sortRows();
+    });
+    search?.addEventListener('input', apply);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && search && document.activeElement !== search && !(e.target as HTMLElement).closest('input, textarea')) {
+        e.preventDefault();
+        search.focus();
+      }
+    });
+    apply();
+  }
+</script>

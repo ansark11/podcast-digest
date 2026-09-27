@@ -1,0 +1,21 @@
+---
+// Episode artwork from the RSS feed, or a pastel initials tile until the
+// pipeline's metadata refresh has filled artwork in.
+import { initials, splitTitle, guestName, tileColors, type Summary } from '../lib/episodes';
+interface Props { episode: Summary; size: number; radius?: number; }
+const { episode, size, radius = Math.round(size * 0.23) } = Astro.props;
+const d = episode.data;
+const { headline, guest } = splitTitle(d.episode_title);
+const [tile, blob, ink] = tileColors(d.guid);
+const label = initials(guestName(guest) ?? headline);
+---
+<div class="thumb" style={`width:${size}px;height:${size}px;border-radius:${radius}px;background:${tile}`}>
+  {d.artwork_url ? (
+    <img src={d.artwork_url} alt="" width={size} height={size} loading="lazy" decoding="async" />
+  ) : (
+    <>
+      <span class="blob" style={`background:${blob}`}></span>
+      <span class="ini" style={`color:${ink};font-size:${Math.round(size * 0.32)}px`}>{label}</span>
+    </>
+  )}
+</div>
