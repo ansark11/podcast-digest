@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import EpisodeList from '../components/EpisodeList.astro';
+---
+<Base title="Saved · Digest" active="saved">
+  <header class="page-title">
+    <h1>Saved</h1>
+    <p class="muted">Summaries you’ve saved on this device</p>
+  </header>
+  <EpisodeList mode="saved" />
+</Base>
+
+<style>
+  .page-title { display: flex; flex-direction: column; gap: 6px; }
+  h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.6px; }
+  p { margin: 0; font-size: 15px; }
+</style>

@@ -8,8 +8,13 @@ gpt-transcribe. Each transcript is summarized with GPT-5.6 Luna, and
 one digest email covers everything new. Designed to run on a schedule
 via GitHub Actions (see .github/workflows/podcast-digest.yml).
 
-Each processed episode's transcript, exact prompt, and raw summary are
-saved to runs/<timestamp>_<title>.json for review and eval purposes.
+Each processed episode produces two committed files, one per episode:
+  summaries/<show>/<date>_<slug>.json   structured summary + episode metadata
+                                        (what the web app reads)
+  transcripts/<show>/<date>_<slug>.txt  the source transcript
+Re-processing an episode overwrites its files (matched by guid), so there
+is only ever one summary per episode. Experimental re-summaries for evals
+live separately under evals/ (see scripts/evals/).
 
 Required environment variables (set as GitHub Actions secrets):
   OPENAI_API_KEY       - OpenAI API key (transcription and summarization)
@@ -19,8 +24,13 @@ Required environment variables (set as GitHub Actions secrets):
 """
 
 import os
+import re
 import json
 import time
+import argparse
+import unicodedata
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 import smtplib
 import tempfile
 from email.mime.multipart import MIMEMultipart
@@ -38,7 +48,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 SHOWS_FILE = BASE_DIR / "config" / "shows.json"
 STATE_FILE = BASE_DIR / "state" / "seen_episodes.json"
-RUNS_DIR = BASE_DIR / "runs"
+SUMMARIES_DIR = BASE_DIR / "summaries"
+TRANSCRIPTS_DIR = BASE_DIR / "transcripts"
 
 TRANSCRIPTION_MAX_BYTES = 24 * 1024 * 1024  # stay safely under the 25MB API limit
 CHUNK_MS = 10 * 60 * 1000                   # split long episodes into 10-minute chunks
@@ -47,9 +58,23 @@ MAX_TRANSCRIPT_CHARS = 400_000              # well under Luna's ~1M token contex
 MIN_FEED_TRANSCRIPT_CHARS = 500             # below this, treat a feed transcript as bogus/placeholder
 TRANSCRIPTION_MODEL = "gpt-transcribe"
 SUMMARY_MODEL = "gpt-5.6-luna"
+# Bump whenever build_summary_prompt() or SUMMARY_SCHEMA changes, so every
+# summary records which prompt produced it. v5 = v4's guidance blocks plus
+# structured (JSON) output.
+PROMPT_VERSION = "v5"
+SUMMARY_FILE_SCHEMA_VERSION = 1
 SUPPORTED_FEED_TRANSCRIPT_TYPES = {"text/plain", "text/vtt", "application/srt", "text/srt"}
 
-openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+# Built lazily so tasks that make no API calls (metadata refresh, eval
+# reports) don't need an OpenAI key.
+_openai_client = None
+
+
+def get_openai_client():
+    global _openai_client
+    if _openai_client is None:
+        _openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    return _openai_client
 
 
 def load_json(path, default):
@@ -65,9 +90,59 @@ def save_json(path, data):
         json.dump(data, f, indent=2)
 
 
+def slugify(text, max_len=60):
+    text = re.sub(r"['\u2019]", "", text)  # "Lenny's" -> "lennys", not "lenny-s"
+    text = re.sub(r"[^\w\s]", " ", text)   # dashes/punctuation separate words before ASCII folding
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
+    text = re.sub(r"[^a-zA-Z0-9]+", "-", text.lower()).strip("-")
+    return text[:max_len].rstrip("-") or "untitled"
+
+
+def to_iso_date(published):
+    """RSS dates are RFC 2822 strings; store ISO 8601 so the app can sort them."""
+    try:
+        return parsedate_to_datetime(published).astimezone(timezone.utc).isoformat()
+    except (TypeError, ValueError):
+        return None
+
+
+def parse_duration(raw):
+    """itunes:duration is either seconds ("3600") or H:MM:SS / MM:SS."""
+    if not raw:
+        return None
+    try:
+        parts = [int(p) for p in str(raw).strip().split(":")]
+    except ValueError:
+        return None
+    seconds = 0
+    for p in parts:
+        seconds = seconds * 60 + p
+    return seconds or None
+
+
+def _entry_metadata(entry, show_artwork_url):
+    """Display metadata for the web app: artwork, show notes, duration, link."""
+    image = entry.get("image")
+    artwork_url = image.get("href") if isinstance(image, dict) else None
+    content = entry.get("content") or []
+    description_html = (content[0].get("value") if content else None) or entry.get("summary") or ""
+    return {
+        "episode_url": entry.get("link"),
+        "artwork_url": artwork_url or show_artwork_url,
+        "description_html": description_html,
+        "duration_seconds": parse_duration(entry.get("itunes_duration")),
+    }
+
+
+def _show_artwork(feed):
+    image = feed.feed.get("image")
+    return image.get("href") if isinstance(image, dict) else None
+
+
 def get_latest_episodes(rss_url, limit=MAX_NEW_EPISODES_PER_SHOW):
     """Pull the most recent episodes from a show's RSS feed."""
     feed = feedparser.parse(rss_url)
+    show_artwork_url = _show_artwork(feed)
     episodes = []
     for entry in feed.entries[:limit]:
         audio_url = None
@@ -84,6 +159,7 @@ def get_latest_episodes(rss_url, limit=MAX_NEW_EPISODES_PER_SHOW):
                 "audio_url": audio_url,
                 "published": entry.get("published", ""),
                 "feed_transcript_tag": entry.get("podcast_transcript"),
+                **_entry_metadata(entry, show_artwork_url),
             })
     return episodes
 
@@ -141,7 +217,7 @@ def _transcribe_chunk(file_path, context=None):
         kwargs = {"model": TRANSCRIPTION_MODEL, "file": f}
         if context:
             kwargs["prompt"] = context
-        result = openai_client.audio.transcriptions.create(**kwargs)
+        result = get_openai_client().audio.transcriptions.create(**kwargs)
     return result.text
 
 
@@ -212,8 +288,8 @@ def build_summary_prompt(show_name, episode_title, transcript):
 
     # Guidance sits after the transcript on purpose: with ~20k tokens of
     # transcript, instructions placed before it are likelier to be lost.
-    return f"""You're summarizing a podcast episode for a personal digest email. The
-reader is relying on this instead of listening, so it has to be both complete and
+    return f"""You're summarizing a podcast episode for a personal digest (an email and a
+reading app). The reader is relying on this instead of listening, so it has to be both complete and
 accurate about what was actually said.
 
 Show: {show_name}
@@ -222,10 +298,16 @@ Episode: {episode_title}
 Transcript:
 {transcript}
 
-Write:
-1. A 2-3 sentence overview
-2. Bullet-point key takeaways. {COVERAGE_GUIDANCE}
-3. Any notable quotes or resources mentioned (if any)
+Return these fields:
+- overview: a 2-3 sentence overview of the episode.
+- takeaways: the key takeaways. {COVERAGE_GUIDANCE}
+  Give each takeaway a short heading (2-6 words naming the topic) and the
+  takeaway itself as the detail.
+- quotes: notable quotes, word for word as said in the episode, with the
+  speaker's name. Use null for the speaker only if it's genuinely unclear.
+  Empty list if nothing stands out.
+- resources: books, tools, products, shows, articles, and other resources
+  mentioned, each with its kind. Empty list if none.
 
 {GROUNDING_GUIDANCE}
 
@@ -233,51 +315,186 @@ Write:
 
 {NAMING_GUIDANCE}
 
-Keep bullets scannable. Plain text, no markdown headers.
+Write plain text in every field: no markdown, asterisks, or bullet characters.
 
 Aim for roughly 400-800 words overall — this is a digest someone reads in a couple
 of minutes, not a transcript. If the episode covers a lot of ground, still cover
-all of it but tighten each bullet. Don't drop topics to hit the range, and don't
+all of it but tighten each takeaway. Don't drop topics to hit the range, and don't
 pad to reach it."""
 
 
+RESOURCE_KINDS = ["book", "tool", "product", "company", "show", "article", "person", "other"]
+
+# Enforced by OpenAI structured outputs (strict mode), so the response always
+# parses and always has every field the web app expects.
+SUMMARY_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["overview", "takeaways", "quotes", "resources"],
+    "properties": {
+        "overview": {"type": "string"},
+        "takeaways": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["heading", "detail"],
+                "properties": {"heading": {"type": "string"}, "detail": {"type": "string"}},
+            },
+        },
+        "quotes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["text", "speaker"],
+                "properties": {"text": {"type": "string"}, "speaker": {"type": ["string", "null"]}},
+            },
+        },
+        "resources": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["name", "kind"],
+                "properties": {"name": {"type": "string"}, "kind": {"type": "string", "enum": RESOURCE_KINDS}},
+            },
+        },
+    },
+}
+
+
 def summarize_transcript(prompt):
-    response = openai_client.chat.completions.create(
+    """Return the summary as a dict matching SUMMARY_SCHEMA."""
+    response = get_openai_client().chat.completions.create(
         model=SUMMARY_MODEL,
         max_completion_tokens=4000,
         reasoning_effort="low",  # this is synthesis, not multi-step reasoning — "medium" (the
                                   # default) burns the entire token budget on internal reasoning
                                   # and returns empty content on open-ended prompts
+        response_format={
+            "type": "json_schema",
+            "json_schema": {"name": "episode_summary", "strict": True, "schema": SUMMARY_SCHEMA},
+        },
         messages=[{"role": "user", "content": prompt}],
     )
-    summary = response.choices[0].message.content
-    if not summary:
+    content = response.choices[0].message.content
+    if not content:
         raise RuntimeError(
             f"Empty summary from {SUMMARY_MODEL} (finish_reason={response.choices[0].finish_reason}, "
             f"reasoning_tokens={response.usage.completion_tokens_details.reasoning_tokens})"
         )
-    return summary
+    return json.loads(content)
 
 
-def save_episode_artifact(show_name, episode, transcript, prompt, summary, transcription_source):
-    """Persist everything needed to review or eval this episode's summary later."""
-    safe_title = "".join(c if c.isalnum() or c in " -_" else "_" for c in episode["title"])[:80]
-    timestamp = time.strftime("%Y%m%d_%H%M%S")
-    path = RUNS_DIR / f"{timestamp}_{safe_title}.json"
-    save_json(path, {
-        "show": show_name,
-        "episode_title": episode["title"],
+def render_summary_text(summary):
+    """Plain-text version of a structured summary, for the email and the eval judge."""
+    lines = [summary["overview"], ""]
+    for t in summary["takeaways"]:
+        lines.append(f"- {t['heading']}: {t['detail']}" if t.get("heading") else f"- {t['detail']}")
+    if summary["quotes"]:
+        lines += ["", "Notable quotes:"]
+        for q in summary["quotes"]:
+            lines.append(f"- \u201c{q['text']}\u201d" + (f" ({q['speaker']})" if q.get("speaker") else ""))
+    if summary["resources"]:
+        lines += ["", "Resources mentioned: " + ", ".join(r["name"] for r in summary["resources"])]
+    return "\n".join(lines)
+
+
+def find_summary_path(show_slug, guid):
+    """Existing summary file for this episode, if any — so a re-run overwrites it."""
+    show_dir = SUMMARIES_DIR / show_slug
+    if not show_dir.exists():
+        return None
+    for path in show_dir.glob("*.json"):
+        if load_json(path, {}).get("guid") == guid:
+            return path
+    return None
+
+
+def episode_file_stem(episode):
+    published = to_iso_date(episode.get("published", ""))
+    date = published[:10] if published else time.strftime("%Y-%m-%d")
+    return f"{date}_{slugify(episode['title'])}"
+
+
+def build_summary_record(show_name, episode, summary, transcription_source, transcript_path,
+                         prompt_version=PROMPT_VERSION, generated_at=None):
+    return {
+        "schema_version": SUMMARY_FILE_SCHEMA_VERSION,
         "guid": episode["guid"],
-        "published": episode["published"],
-        "audio_url": episode["audio_url"],
+        "show": show_name,
+        "show_slug": slugify(show_name),
+        "episode_title": episode["title"],
+        "published": to_iso_date(episode.get("published", "")),
+        "audio_url": episode.get("audio_url"),
+        "episode_url": episode.get("episode_url"),
+        "artwork_url": episode.get("artwork_url"),
+        "description_html": episode.get("description_html"),
+        "duration_seconds": episode.get("duration_seconds"),
+        "transcript_path": transcript_path,
         "transcription_source": transcription_source,
         "summary_model": SUMMARY_MODEL,
-        "prompt": prompt,
-        "transcript": transcript,
+        "prompt_version": prompt_version,
+        "generated_at": generated_at or datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "summary": summary,
-        "processed_at": timestamp,
-    })
-    print(f"  Saved run artifact: {path.relative_to(BASE_DIR)}")
+    }
+
+
+def save_episode_outputs(show_name, episode, transcript, summary, transcription_source):
+    """Write the episode's summary and transcript, replacing any earlier version."""
+    show_slug = slugify(show_name)
+    summary_path = find_summary_path(show_slug, episode["guid"]) or (
+        SUMMARIES_DIR / show_slug / f"{episode_file_stem(episode)}.json"
+    )
+    transcript_path = TRANSCRIPTS_DIR / show_slug / f"{summary_path.stem}.txt"
+    transcript_path.parent.mkdir(parents=True, exist_ok=True)
+    transcript_path.write_text(transcript)
+
+    record = build_summary_record(
+        show_name, episode, summary, transcription_source,
+        str(transcript_path.relative_to(BASE_DIR)),
+    )
+    save_json(summary_path, record)
+    print(f"  Saved {summary_path.relative_to(BASE_DIR)}")
+    return record
+
+
+METADATA_FIELDS = ("episode_url", "artwork_url", "description_html", "duration_seconds")
+
+
+def refresh_metadata(shows):
+    """Fill in artwork, show notes, duration and link for any summary missing them.
+
+    Runs every pipeline run (one feed fetch per show, no API cost), so older
+    summaries, or ones written while the feed lacked a field, catch up.
+    """
+    for show in shows:
+        show_dir = SUMMARIES_DIR / slugify(show["name"])
+        paths = sorted(show_dir.glob("*.json")) if show_dir.exists() else []
+        stale = [p for p in paths if any(not load_json(p, {}).get(f) for f in METADATA_FIELDS)]
+        if not stale:
+            continue
+
+        feed = feedparser.parse(show["rss_url"])
+        show_artwork_url = _show_artwork(feed)
+        by_guid = {e.get("id", e.get("link")): e for e in feed.entries}
+        updated = 0
+        for path in stale:
+            record = load_json(path, {})
+            entry = by_guid.get(record.get("guid"))
+            if entry is None:
+                continue
+            fresh = _entry_metadata(entry, show_artwork_url)
+            changed = False
+            for field in METADATA_FIELDS:
+                if not record.get(field) and fresh.get(field):
+                    record[field] = fresh[field]
+                    changed = True
+            if changed:
+                save_json(path, record)
+                updated += 1
+        print(f"Metadata: updated {updated} of {len(stale)} incomplete summary file(s) for {show['name']}")
 
 
 def send_digest_email(digest_sections):
@@ -300,7 +517,7 @@ def send_digest_email(digest_sections):
 
 
 def process_episode(show_name, episode):
-    """Transcribe + summarize one episode, saving a runs/ artifact. Returns the summary text."""
+    """Transcribe + summarize one episode, saving its summary and transcript. Returns the summary dict."""
     transcript = fetch_feed_transcript(episode.get("feed_transcript_tag"))
     if transcript:
         print("  Using transcript published in the feed (skipped audio transcription)")
@@ -314,7 +531,7 @@ def process_episode(show_name, episode):
 
     prompt = build_summary_prompt(show_name, episode["title"], transcript)
     summary = summarize_transcript(prompt)
-    save_episode_artifact(show_name, episode, transcript, prompt, summary, transcription_source)
+    save_episode_outputs(show_name, episode, transcript, summary, transcription_source)
     return summary
 
 
@@ -339,7 +556,8 @@ def main():
             print(f"Processing new episode: {name} — {ep['title']}")
             try:
                 summary = process_episode(name, ep)
-                digest_sections.append(f"=== {name}: {ep['title']} ===\n{summary}")
+                link = f"\n{ep['episode_url']}" if ep.get("episode_url") else ""
+                digest_sections.append(f"=== {name}: {ep['title']} ==={link}\n\n{render_summary_text(summary)}")
                 seen_guids.add(ep["guid"])
             except Exception as e:
                 # Don't let one bad episode kill the whole run
@@ -355,6 +573,18 @@ def main():
 
     save_json(STATE_FILE, seen)
 
+    try:
+        refresh_metadata(shows)
+    except Exception as e:
+        print(f"Metadata refresh failed (summaries are unaffected): {e}")
+
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Podcast digest pipeline")
+    parser.add_argument("--refresh-metadata-only", action="store_true",
+                        help="Only fill in missing artwork/show notes/duration on existing summaries")
+    args = parser.parse_args()
+    if args.refresh_metadata_only:
+        refresh_metadata(load_json(SHOWS_FILE, []))
+    else:
+        main()

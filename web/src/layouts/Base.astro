@@ -1,0 +1,57 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { getEpisodes, formatDate } from '../lib/episodes';
+
+interface Props { title: string; active?: 'library' | 'saved'; description?: string; }
+const { title, active, description = 'Podcast episode summaries' } = Astro.props;
+
+const episodes = await getEpisodes();
+const shows = new Set(episodes.map((e) => e.data.show)).size;
+const lastRun = episodes.map((e) => e.data.generated_at).sort().at(-1) ?? null;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description} />
+  <meta name="theme-color" content="#EEF2F9" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#111320" media="(prefers-color-scheme: dark)" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <title>{title}</title>
+</head>
+<body>
+  <div class="shell">
+    <div class="sidebar-col">
+    <nav class="sidebar" aria-label="Main">
+      <a class="brand" href="/">
+        <span class="brand-mark"><Icon name="mic" /></span>
+        <span class="brand-name">Digest</span>
+      </a>
+      <div class="nav">
+        <a href="/" aria-current={active === 'library' ? 'page' : undefined}><Icon name="list" /><span>Library</span></a>
+        <a href="/saved" aria-current={active === 'saved' ? 'page' : undefined}><Icon name="bookmark" /><span>Saved</span><span class="nav-count" data-saved-count></span></a>
+      </div>
+      <div class="last-run">
+        <span class="eyebrow">Last run</span>
+        <span style="font-size:14px;font-weight:600">{formatDate(lastRun, true)}</span>
+        <span class="muted" style="font-size:13px">{shows} {shows === 1 ? 'show' : 'shows'} · {episodes.length} summaries</span>
+      </div>
+    </nav>
+    </div>
+    <main class="main" id="main">
+      <slot />
+    </main>
+  </div>
+  <script>
+    import { load } from '../lib/store';
+    const n = load().saved.length;
+    document.querySelectorAll<HTMLElement>('[data-saved-count]').forEach((el) => { el.textContent = n ? String(n) : ''; });
+  </script>
+</body>
+</html>

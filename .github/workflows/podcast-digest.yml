@@ -35,19 +35,13 @@ jobs:
           DIGEST_TO_EMAIL: ${{ secrets.DIGEST_TO_EMAIL }}
         run: python scripts/podcast_digest.py
 
-      - name: Upload run artifacts (transcripts, prompts, summaries)
+      # Summaries and transcripts are committed so they persist between runs
+      # (the runner's disk is wiped) and so the web app can read them.
+      - name: Commit new summaries, transcripts and state
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: podcast-digest-runs-${{ github.run_number }}
-          path: runs/
-          if-no-files-found: ignore
-          retention-days: 30
-
-      - name: Commit updated state
         run: |
           git config user.name "podcast-digest-bot"
           git config user.email "actions@github.com"
-          git add state/seen_episodes.json
-          git diff --staged --quiet || git commit -m "Update seen episodes state"
+          git add state/seen_episodes.json summaries/ transcripts/
+          git diff --staged --quiet || git commit -m "Add podcast summaries and update state"
           git push

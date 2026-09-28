@@ -1,10 +1,11 @@
 """
-One-off backfill: process a batch of past episodes into runs/ artifacts,
-without sending a digest email. Used to seed real data for eval_runs.py.
+Backfill: summarize past episodes into summaries/ (and transcripts/) without
+sending a digest email. Use it to populate the app with older episodes, or to
+give the eval tooling more source material.
 
 Usage:
-  python scripts/backfill_runs.py --count 12
-  python scripts/backfill_runs.py --count 5 --show "Lenny's Podcast"
+  python scripts/backfill.py --count 12
+  python scripts/backfill.py --count 5 --show "Lenny's Podcast"
 """
 
 import argparse
@@ -40,6 +41,7 @@ def backfill(show_name_filter, count):
             except Exception as e:
                 print(f"  Failed: {e}")
 
+    pd.refresh_metadata(shows)
     print("Backfill complete.")
 
 

@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "guid": "substack:post:209025231",
+  "show": "Lenny's Podcast",
+  "show_slug": "lennys-podcast",
+  "episode_title": "This CPO regrets that product management exists | Tom Verrilli (CPO of Whatnot)",
+  "published": "2026-08-02T12:32:02+00:00",
+  "audio_url": "https://pscrb.fm/rss/p/api.substack.com/feed/podcast/209025231/702fecd1ae63276633753e2cc9356073.mp3",
+  "episode_url": "https://www.lennysnewsletter.com/p/this-cpo-regrets-that-product-management",
+  "artwork_url": "https://substackcdn.com/feed/podcast/10845/post/209025231/99f0d6efed7b33fb19034894f3a04aa6.jpg",
+  "description_html": "<p><strong>Tom Verrilli</strong> is the chief product officer at Whatnot, a live shopping platform that\u2019s become the fastest-growing U.S. marketplace business in history, with over $8 billion in GMV. Before joining Whatnot, Tom was CPO at Twitch and director of product growth at Twitter (during one of the most turbulent periods in the company\u2019s history).</p><p></p><p><strong>In our in-depth conversation, we discuss:</strong></p><p>1. Why Whatnot\u2019s product team was founded on the premise \u201cwe regret that product management exists\u201d</p><p>2. How AI is reshaping the PM role</p><p>3. What Tom looks for when hiring PMs</p><p>4. The shift toward senior ICs doing the work</p><p>5. How AI has transformed data science at Whatnot</p><p>6. Tom\u2019s \u201cplay the accordion\u201d mental model</p><p>7. Why \u201chire great people and get out of their way\u201d fails</p><p>8. His biggest lessons from his time at Twitter</p><p>\u2014</p><p><strong>Brought to you by:</strong></p><p><a href=\"https://workos.com/lenny\" target=\"_blank\"><strong>WorkOS</strong></a>\u2014Make your app enterprise-ready, with SSO, SCIM, RBAC, and more</p><p><a href=\"https://mercury.com/command?utm_source=lennys&#38;utm_medium=sponsored_newsletter&#38;utm_campaign=26q3_brand_campaign\" target=\"_blank\"><strong>Mercury</strong></a>\u2014Radically different banking, now with Command</p><p>\u2014</p><p><strong>Episode transcript:</strong> <a href=\"https://www.lennysnewsletter.com/p/this-cpo-regrets-that-product-management\" target=\"_blank\">https://www.lennysnewsletter.com/p/this-cpo-regrets-that-product-management</a></p><p>\u2014</p><p><strong>Archive of all Lenny's Podcast transcripts:</strong> <a href=\"https://www.dropbox.com/scl/fo/yxi4s2w998p1gvtpu4193/AMdNPR8AOw0lMklwtnC0TrQ?rlkey=j06x0nipoti519e0xgm23zsn9&#38;st=ahz0fj11&#38;dl=0\" target=\"_blank\">https://www.dropbox.com/scl/fo/yxi4s2w998p1gvtpu4193/AMdNPR8AOw0lMklwtnC0TrQ?rlkey=j06x0nipoti519e0xgm23zsn9&amp;st=ahz0fj11&amp;dl=0</a></p><p>\u2014</p><p><strong>Where to find Tom Verrilli:</strong></p><p>\u2022 X: <a href=\"https://x.com/tdrobbo\" target=\"_blank\">https://x.com/tdrobbo</a></p><p>\u2022 LinkedIn: <a href=\"https://www.linkedin.com/in/tom-robertson-042\" target=\"_blank\">https://www.linkedin.com/in/tom-robertson-042</a></p><p>\u2014</p><p><strong>Where to find Lenny:</strong></p><p>\u2022 Newsletter: <a href=\"https://www.lennysnewsletter.com\" target=\"_blank\">https://www.lennysnewsletter.com</a></p><p>\u2022 X: <a href=\"https://twitter.com/lennysan\" target=\"_blank\">https://twitter.com/lennysan</a></p><p>\u2022 LinkedIn: <a href=\"https://www.linkedin.com/in/lennyrachitsky/\" target=\"_blank\">https://www.linkedin.com/in/lennyrachitsky/</a></p><p>\u2014</p><p><strong>In this episode, we cover:</strong></p><p>(00:00) Introduction</p><p>(02:40) \u201cWe regret that product management exists\u201d: what it means and why</p><p>(08:30) When specialization makes sense, and when it doesn\u2019t</p><p>(15:20) How Whatnot structures its PM org</p><p>(17:28) What 31,832 PM applications revealed about the function</p><p>(19:40) How to develop systems thinking</p><p>(22:10) The shift to senior ICs doing IC work</p><p>(32:26) Advice for PMs struggling in today\u2019s market</p><p>(35:22) How AI has transformed work at Whatnot</p><p>(41:14) The data scientist problem</p><p>(42:48) Which roles are trending up and down</p><p>(44:48) What the product team of the future looks like</p><p>(46:29) Why core PM skills are the most durable in an AI world</p><p>(49:23) How to get the most out of the people you hire</p><p>(53:32) Navigating the CPO-founder relationship</p><p>(57:34) Advice for aspiring CPO\u2019s</p><p>(59:16) How to know when to stand firm and when to step back</p><p>(01:01:38) Play the accordion: balancing strategic vision with fast iteration</p><p>(01:06:35) Agentic commerce vs. live commerce</p><p>(01:09:46) Lessons from Twitter</p><p>(01:13:07) Failure corner</p><p>(01:15:45) Lightning round and final thoughts</p><p>\u2014</p><p><strong>Referenced:</strong></p><p>\u2022 Whatnot: <a href=\"https://www.whatnot.com\" target=\"_blank\">https://www.whatnot.com</a></p><p>\u2022 Building, and Whatnot: <a href=\"https://www.linkedin.com/pulse/building-whatnot-tom-verrilli-bwkdc\" target=\"_blank\">https://www.linkedin.com/pulse/building-whatnot-tom-verrilli-bwkdc</a></p><p>\u2022 Twitch: <a href=\"https://www.twitch.tv\" target=\"_blank\">https://www.twitch.tv</a></p><p>\u2022 Why Netflix is betting on systems thinkers\u2014not specialists\u2014in the AI era | Elizabeth Stone (CPTO): <a href=\"https://www.lennysnewsletter.com/p/netflix-cpto-on-ai-and-the-future\" target=\"_blank\">https://www.lennysnewsletter.com/p/netflix-cpto-on-ai-and-the-future</a></p><p>\u2022 Peter Bailis on LinkedIn: <a href=\"https://www.linkedin.com/in/pbailis\" target=\"_blank\">https://www.linkedin.com/in/pbailis</a></p><p>\u2022 Mike Krieger on LinkedIn: <a href=\"https://www.linkedin.com/in/mikekrieger\" target=\"_blank\">https://www.linkedin.com/in/mikekrieger</a></p><p>\u2022 Anthropic\u2019s CPO on what comes next | Mike Krieger (co-founder of Instagram): <a href=\"https://www.lennysnewsletter.com/p/anthropics-cpo-heres-what-comes-next\" target=\"_blank\">https://www.lennysnewsletter.com/p/anthropics-cpo-heres-what-comes-next</a></p><p>\u2022 Ben Kus on LinkedIn: <a href=\"https://www.linkedin.com/in/benkus\" target=\"_blank\">https://www.linkedin.com/in/benkus</a></p><p>\u2022 Henry Shi on LinkedIn: <a href=\"https://www.linkedin.com/in/henrythe9th\" target=\"_blank\">https://www.linkedin.com/in/henrythe9th</a></p><p>\u2022 Hex Threads: <a href=\"https://hex.tech/product/threads\" target=\"_blank\">https://hex.tech/product/threads</a></p><p>\u2022 Product management theater | Marty Cagan (Silicon Valley Product Group): <a href=\"https://www.lennysnewsletter.com/p/product-management-theater-marty\" target=\"_blank\">https://www.lennysnewsletter.com/p/product-management-theater-marty</a></p><p>\u2022 Grant LaFontaine on LinkedIn: <a href=\"https://www.linkedin.com/in/grantlafontaine\" target=\"_blank\">https://www.linkedin.com/in/grantlafontaine</a></p><p>\u2022 Logan Head on LinkedIn: <a href=\"https://www.linkedin.com/in/logan-head\" target=\"_blank\">https://www.linkedin.com/in/logan-head</a></p><p>\u2022 Emmett Shear on LinkedIn: <a href=\"https://www.linkedin.com/in/emmettshear\" target=\"_blank\">https://www.linkedin.com/in/emmettshear</a></p><p>\u2022 Kara Swisher on X: <a href=\"https://x.com/karaswisher\" target=\"_blank\">https://x.com/karaswisher</a></p><p>\u2022 Jeff Bezos: Amazon and Blue Origin\u2014Lex Fridman Podcast: <a href=\"https://www.youtube.com/watch?v=DcWqzZ3I2cY\" target=\"_blank\">https://www.youtube.com/watch?v=DcWqzZ3I2cY</a></p><p>\u2022 <em>Star City </em>on AppleTV+: <a href=\"https://tv.apple.com/us/show/star-city/umc.cmc.2l8p785osmtmiyk64bh6tfde1\" target=\"_blank\">https://tv.apple.com/us/show/star-city/umc.cmc.2l8p785osmtmiyk64bh6tfde1</a></p><p>\u2022 <em>For All Mankind</em> on AppleTV+: <a href=\"https://tv.apple.com/us/show/for-all-mankind/umc.cmc.6wsi780sz5tdbqcf11k76mkp7\" target=\"_blank\">https://tv.apple.com/us/show/for-all-mankind/umc.cmc.6wsi780sz5tdbqcf11k76mkp7</a></p><p>\u2022 Service NSW Mobile App: <a href=\"https://www.service.nsw.gov.au/services/service-nsw-mobile-app\" target=\"_blank\">https://www.service.nsw.gov.au/services/service-nsw-mobile-app</a></p><p>\u2022 Rudyard Kipling: <a href=\"https://en.wikipedia.org/wiki/Rudyard_Kipling\" target=\"_blank\">https://en.wikipedia.org/wiki/Rudyard_Kipling</a></p><p>\u2022 <a href=\"http://E-fish.com\" target=\"_blank\">E-fish.com</a>: <a href=\"https://www.e-fish.com\" target=\"_blank\">https://www.e-fish.com</a></p><p>\u2014</p><p><strong>Recommended books:</strong></p><p>\u2022 <em>The Hard Thing About Hard Things: Building a Business When There Are No Easy Answers\u2015Straight Talk on the Challenges of Entrepreneurship</em>: <a href=\"https://www.amazon.com/dp/0062273205\" target=\"_blank\">https://www.amazon.com/dp/0062273205</a></p><p>\u2022 <em>The Purpose Driven Church: Every Church Is Big in God\u2019s Eyes</em>: <a href=\"https://www.amazon.com/dp/0310201063\" target=\"_blank\">https://www.amazon.com/dp/0310201063</a></p><p>\u2022 <em>Babel: Or the Necessity of Violence: An Arcane History of the Oxford Translators\u2019 Revolution\u2015An Historic Fantasy of Dark Academia</em>: <a href=\"https://www.amazon.com/Babel-Necessity-Violence-Translators-Revolution/dp/0063021439\" target=\"_blank\">https://www.amazon.com/Babel-Necessity-Violence-Translators-Revolution/dp/0063021439</a></p><p>\u2014</p><p>Production and marketing by <a href=\"https://penname.co/\" target=\"_blank\">https://penname.co/</a>. For inquiries about sponsoring the podcast, email <a href=\"mailto:podcast@lennyrachitsky.com\" target=\"_blank\">podcast@lennyrachitsky.com</a>.</p><p>\u2014</p><p><em>Lenny may be an investor in the companies discussed.</em></p> <br /><br />To hear more, visit <a href=\"https://www.lennysnewsletter.com?utm_medium=podcast&#38;utm_campaign=show-notes-no-free-preview-language\">www.lennysnewsletter.com</a>",
+  "duration_seconds": 5098,
+  "transcript_path": "transcripts/lennys-podcast/2026-08-02_this-cpo-regrets-that-product-management-exists-tom-verrilli.txt",
+  "transcription_source": "gpt-transcribe",
+  "summary_model": "gpt-5.6-luna",
+  "prompt_version": "v4",
+  "generated_at": "2026-09-12T17:01:13-04:00",
+  "summary": {
+    "overview": "Tom Verrilli, CPO of Whatnot and former CPO of Twitch, argues that product management should be treated as a specialized resource rather than a default role on every team. Whatnot operates with roughly 20 PMs, reallocating them around the company\u2019s most important problems while expecting senior product leaders to remain deeply involved in hands-on work. The conversation covers hiring, AI\u2019s impact on product work, founder-led organizations, product judgment, and Whatnot\u2019s future in live commerce.",
+    "takeaways": [
+      {
+        "heading": null,
+        "detail": "Verrilli\u2019s statement that \u201cwe regret that product management exists\u201d is intended to challenge the assumption that every engineering or design team needs a PM. Historically, founders and business leaders worked directly with engineering and design; PMs became more common as companies scaled and needed to delegate execution decisions."
+      },
+      {
+        "heading": null,
+        "detail": "He does not believe PMs are unnecessary. Rather, product management should be deployed where there is a specific need, while engineers and designers should be empowered to build their own product judgment through repeated practice instead of being \u201cbabysat\u201d by PMs."
+      },
+      {
+        "heading": null,
+        "detail": "Verrilli thinks the common staffing ratio of several engineers plus a designer, PM, and engineering manager produced too many PMs. In areas such as infrastructure, engineers may already have enough context to make good decisions, and adding a PM can prevent them from developing that capability."
+      },
+      {
+        "heading": null,
+        "detail": "Whatnot has just over 20 PMs, organized broadly around buyers, sellers, and trust/risk. PMs are not permanently attached to teams; every six months, leadership defines what must be true, assigns accountable owners to the most important outcomes and projects, and reallocates PMs accordingly."
+      },
+      {
+        "heading": null,
+        "detail": "At Whatnot, only four or five people manage other PMs, and those managers spend more than 90% of their time doing individual-contributor work. Verrilli says he still spends roughly half his time as an IC, working directly with customers, data, code, engineering, design, and product specifications."
+      },
+      {
+        "heading": null,
+        "detail": "He believes senior IC product work can create more leverage than adding layers of management. Experienced product leaders can make decisions quickly, see trade-offs across multiple areas, and avoid prolonged alignment debates\u2014for example, assigning one PM responsibility for both discovery and advertising at Twitch to resolve competing incentives."
+      },
+      {
+        "heading": null,
+        "detail": "In hiring, Whatnot received 31,832 PM applications over two years and hired one person. Verrilli says candidates who focus heavily on stakeholder management, alignment meetings, and \u201cpolitics\u201d are becoming less attractive; Whatnot looks for people who can combine macro-level systems thinking with concrete, fast execution."
+      },
+      {
+        "heading": null,
+        "detail": "Strong candidates can explain specifically what they built, demonstrate that they made decisions and created change, and defend a point of view using data. Verrilli distinguishes this from people who worked at large companies mainly by maintaining or polishing existing products."
+      },
+      {
+        "heading": null,
+        "detail": "To develop systems thinking, he recommends mentally following experiments through their possible consequences: what happens if the result is positive or negative, how the strategy changes, and what unexpected effects could appear at greater scale. His internal shorthand is \u201cknow, then go\u201d: think through risks, then move."
+      },
+      {
+        "heading": null,
+        "detail": "AI is not the sole reason product teams are changing, but Verrilli says it substantially increases individual leverage. PMs can query data, understand codebases, estimate engineering work, detect regressions, and investigate customer behavior much faster; he has spent less time with data scientists while spending more time directly analyzing product data."
+      },
+      {
+        "heading": null,
+        "detail": "He expects more hybrid, lightweight technical-lead roles and more freedom for engineers, designers, PMs, and data scientists to solve problems outside formal team boundaries. However, Whatnot will still use specialist teams for major, well-defined projects."
+      },
+      {
+        "heading": null,
+        "detail": "Verrilli criticizes the \u201chire great people and get out of their way\u201d model when it means leaders stop understanding the details. At Whatnot, leaders generally \u201cverify, then trust,\u201d going deep enough into data, workflows, and code to make informed macro decisions."
+      },
+      {
+        "heading": null,
+        "detail": "He says founder-led, top-down management works when leaders are sufficiently capable and close to ground truth. Whatnot CEO Grant sometimes clears his entire day to investigate a disputed issue with the team; Verrilli sees this as truth-seeking rather than micromanagement."
+      },
+      {
+        "heading": null,
+        "detail": "For executives working with strong founders, Verrilli advises calibrating how the founder likes to debate, avoiding competition over vision, and starting disagreements with curiosity. If the CEO\u2019s mind is made up, or there is no useful data, he says it may be better to accept the decision rather than argue for its own sake."
+      },
+      {
+        "heading": null,
+        "detail": "His \u201cplay the accordion\u201d model combines broad planning with rapid iteration: first expand outward to clarify the desired outcome and hypotheses, then compress into a concrete experiment, learn from it, and expand again. He illustrated this with Whatnot\u2019s tension between making listings searchable and preserving the speed that makes live selling attractive."
+      },
+      {
+        "heading": null,
+        "detail": "Verrilli expects agentic commerce to handle high-intent and repetitive purchases, but does not think it will replace low-intent, social shopping. Whatnot aims to combine internet-scale convenience with the discovery and human interaction of physical retail."
+      },
+      {
+        "heading": null,
+        "detail": "From Twitter, he learned both the power of genuine product-market fit and the cost of weak leadership. Twitter\u2019s character-limit change was widely understood to be necessary, but leadership delayed the decision through repeated working groups; he says many apparently complex product problems are actually leadership problems."
+      },
+      {
+        "heading": null,
+        "detail": "His recurring failure pattern is trusting averages without examining individual use cases. A feature used by only 3% of people may be essential to that group, especially on a marketplace where sellers\u2019 businesses depend on particular workflows."
+      },
+      {
+        "heading": null,
+        "detail": "In the lightning round, Verrilli recommended The Hard Thing About Hard Things, The Purpose Driven Church, and Babel; mentioned Star City on Apple TV; praised Australia\u2019s Service NSW app; and offered \u201cI\u2019ll figure it out\u201d as a life motto. He also described buying a California spiny lobster on Whatnot from eFishCo, which ships seafood directly from San Diego docks."
+      }
+    ],
+    "quotes": [
+      {
+        "text": "We regret that product management exists.",
+        "speaker": null
+      },
+      {
+        "text": "You hire one where there\u2019s really specific need.",
+        "speaker": null
+      },
+      {
+        "text": "Know, then go.",
+        "speaker": null
+      },
+      {
+        "text": "The number of people who do really well in a product interview\u2026 [can still show] how quickly the thinking decays from folks who are good at the theater but not the specifics.",
+        "speaker": null
+      },
+      {
+        "text": "You can\u2019t make good macro decisions without the micro.",
+        "speaker": null
+      }
+    ],
+    "resources": [
+      {
+        "name": "The Hard Thing About Hard Things",
+        "kind": "book"
+      },
+      {
+        "name": "The Purpose Driven Church",
+        "kind": "book"
+      },
+      {
+        "name": "Babel",
+        "kind": "book"
+      },
+      {
+        "name": "Star City",
+        "kind": "show"
+      },
+      {
+        "name": "Service NSW",
+        "kind": "product"
+      },
+      {
+        "name": "Hex",
+        "kind": "tool"
+      },
+      {
+        "name": "Claude",
+        "kind": "tool"
+      }
+    ]
+  }
+}

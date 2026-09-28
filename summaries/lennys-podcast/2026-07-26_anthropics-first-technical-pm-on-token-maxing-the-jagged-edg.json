@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "guid": "substack:post:207214207",
+  "show": "Lenny's Podcast",
+  "show_slug": "lennys-podcast",
+  "episode_title": "Anthropic\u2019s first technical PM on token maxing, the jagged edge, and living in the future | Dianne Penn",
+  "published": "2026-07-26T12:32:06+00:00",
+  "audio_url": "https://pscrb.fm/rss/p/api.substack.com/feed/podcast/207214207/aaa7067cd960f0369661f0976cbe3d0a.mp3",
+  "episode_url": "https://www.lennysnewsletter.com/p/anthropics-first-technical-pm-on",
+  "artwork_url": "https://substackcdn.com/feed/podcast/10845/post/207214207/756e556fcbda393739f83e6d27dbbe52.jpg",
+  "description_html": "<p><strong>Dianne Penn</strong> is Head of Product for Anthropic\u2019s AI Research and Labs teams. She joined in 2023 as Anthropic\u2019s first technical product manager, when the entire product team was five engineers, and has since helped ship every model from Claude 2 through Fable, and helped incubate Claude Code, MCP, Skills, computer use, tool use, and reasoning. Before Anthropic, she helped build Alexa\u2019s AI at Amazon and, before that, traded high-yield bonds at JP Morgan Chase.</p><p></p><p><strong>In our in-depth conversation, we discuss:</strong></p><p>1. What Anthropic\u2019s early days were like</p><p>2. The inflection points that turned Anthropic from an underdog into the fastest-growing company in history</p><p>3. How exactly Claude got so good at coding</p><p>4. The eval-driven development loop her team is pioneering</p><p>5. How to find joy in AI when everything is moving this fast</p><p>6. Why Claude\u2019s willingness to push back is key to its success</p><p>7. Where human judgment remains irreplaceable</p><p>\u2014</p><p><strong>Brought to you by:</strong></p><p><a href=\"https://workos.com/lenny\" target=\"_blank\"><strong>WorkOS</strong></a>\u2014Make your app enterprise-ready, with SSO, SCIM, RBAC, and more</p><p><a href=\"https://mercury.com/command?utm_source=lennys&#38;utm_medium=sponsored_newsletter&#38;utm_campaign=26q3_brand_campaign\" target=\"_blank\"><strong>Mercury</strong></a>\u2014Radically different banking, now with Command</p><p>\u2014</p><p><strong>Episode transcript: </strong><a href=\"https://www.lennysnewsletter.com/p/anthropics-first-technical-pm-on\" target=\"_blank\">https://www.lennysnewsletter.com/p/anthropics-first-technical-pm-on</a></p><p>\u2014</p><p><strong>Archive of all Lenny's Podcast transcripts: </strong><a href=\"https://www.dropbox.com/scl/fo/yxi4s2w998p1gvtpu4193/AMdNPR8AOw0lMklwtnC0TrQ?rlkey=j06x0nipoti519e0xgm23zsn9&#38;st=ahz0fj11&#38;dl=0\" target=\"_blank\">https://www.dropbox.com/scl/fo/yxi4s2w998p1gvtpu4193/AMdNPR8AOw0lMklwtnC0TrQ?rlkey=j06x0nipoti519e0xgm23zsn9&amp;st=ahz0fj11&amp;dl=0</a></p><p>\u2014</p><p><strong>Where to find Dianne Penn:</strong></p><p>\u2022 LinkedIn: <a href=\"http://linkedin.com/in/dianne-na-penn\" target=\"_blank\">linkedin.com/in/dianne-na-penn</a></p><p>\u2014</p><p><strong>Where to find Lenny:</strong></p><p>\u2022 Newsletter: <a href=\"https://www.lennysnewsletter.com\" target=\"_blank\">https://www.lennysnewsletter.com</a></p><p>\u2022 X: <a href=\"https://twitter.com/lennysan\" target=\"_blank\">https://twitter.com/lennysan</a></p><p>\u2022 LinkedIn: <a href=\"https://www.linkedin.com/in/lennyrachitsky/\" target=\"_blank\">https://www.linkedin.com/in/lennyrachitsky/</a></p><p>\u2014</p><p><strong>In this episode, we cover:</strong></p><p>(00:00) Introduction</p><p>(02:31) Early Anthropic days</p><p>(08:55) Big milestones</p><p>(13:50) Inside the exponential</p><p>(20:02) Token maxing</p><p>(23:30) Anthropic Labs and the incubation model</p><p>(27:30) How the research role works</p><p>(31:35) How to become a top researcher</p><p>(35:18) Frontier model safeguards</p><p>(39:38) Hiring in the AI era</p><p>(44:16) Building an eval set</p><p>(47:48) Evals vs PRDs</p><p>(49:55) The importance of hands-on leadership</p><p>(52:46) Finding joy in AI</p><p>(58:10) How Dianne uses Claude</p><p>(01:01:05) Avoiding overreliance on AI</p><p>(01:03:50) The constitution that makes Claude better</p><p>(01:07:11) AI writing and verification</p><p>(01:11:40) Where human brains will continue to be valuable</p><p>(01:14:10) Navigating AI with kids</p><p>(01:16:26) Alignment, the future of the PM role, and burnout</p><p>(01:21:54) Lightning round and final thoughts</p><p>\u2014</p><p><strong>Referenced:</strong></p><p>\u2022 Anthropic: <a href=\"https://www.anthropic.com\" target=\"_blank\">https://www.anthropic.com</a></p><p>\u2022 Golden Gate Claude: <a href=\"https://www.anthropic.com/news/golden-gate-claude\" target=\"_blank\">https://www.anthropic.com/news/golden-gate-claude</a></p><p>\u2022 Dario Amodei\u2019s website: <a href=\"https://darioamodei.com\" target=\"_blank\">https://darioamodei.com</a></p><p>\u2022 Scaling Laws and Interpretability of Learning from Repeated Data: <a href=\"https://www.anthropic.com/research/scaling-laws-and-interpretability-of-learning-from-repeated-data\" target=\"_blank\">https://www.anthropic.com/research/scaling-laws-and-interpretability-of-learning-from-repeated-data</a></p><p>\u2022 Tokenmaxxing: How Top Builders Use AI To Do The Work Of 400 Engineers: <a href=\"https://www.ycombinator.com/library/Pa-tokenmaxxing-how-top-builders-use-ai-to-do-the-work-of-400-engineers\" target=\"_blank\">https://www.ycombinator.com/library/Pa-tokenmaxxing-how-top-builders-use-ai-to-do-the-work-of-400-engineers</a></p><p>\u2022 Garry Tan on X: <a href=\"https://x.com/garrytan\" target=\"_blank\">https://x.com/garrytan</a></p><p>\u2022 Anthropic co-founder on quitting OpenAI, AGI predictions, $100M talent wars, 20% unemployment, and the nightmare scenarios keeping him up at night | Ben Mann: <a href=\"https://www.lennysnewsletter.com/p/anthropic-co-founder-benjamin-mann\" target=\"_blank\">https://www.lennysnewsletter.com/p/anthropic-co-founder-benjamin-mann</a></p><p>\u2022 Anthropic\u2019s CPO on what comes next | Mike Krieger (co-founder of Instagram): <a href=\"https://www.lennysnewsletter.com/p/anthropics-cpo-heres-what-comes-next\" target=\"_blank\">https://www.lennysnewsletter.com/p/anthropics-cpo-heres-what-comes-next</a></p><p>\u2022 Introducing Labs: <a href=\"https://www.anthropic.com/news/introducing-anthropic-labs\" target=\"_blank\">https://www.anthropic.com/news/introducing-anthropic-labs</a></p><p>\u2022 Louis CK | about airplane Wi Fi: <a href=\"https://www.youtube.com/watch?v=me4BZBsHwZs\" target=\"_blank\">https://www.youtube.com/watch?v=me4BZBsHwZs</a></p><p>\u2022 What happens after coding is solved? | Fiona Fung (Manager of the Claude Code and Cowork Teams): <a href=\"https://www.lennysnewsletter.com/p/building-the-most-ai-pilled-engineering\" target=\"_blank\">https://www.lennysnewsletter.com/p/building-the-most-ai-pilled-engineering</a></p><p>\u2022 The Anthropic Hive Mind: <a href=\"https://steve-yegge.medium.com/the-anthropic-hive-mind-d01f768f3d7b\" target=\"_blank\">https://steve-yegge.medium.com/the-anthropic-hive-mind-d01f768f3d7b</a></p><p>\u2022 How to build a company that withstands any era | Eric Ries, Lean Startup author: <a href=\"https://www.lennysnewsletter.com/p/how-to-build-a-company-that-withstands\" target=\"_blank\">https://www.lennysnewsletter.com/p/how-to-build-a-company-that-withstands</a></p><p>\u2022 <em>Fallout </em>on Prime Video: <a href=\"https://www.amazon.com/dp/B0CN4GGGQ2\" target=\"_blank\">https://www.amazon.com/dp/B0CN4GGGQ2</a></p><p>\u2022 <em>Fallout</em> (video game): <a href=\"https://fallout.bethesda.net\" target=\"_blank\">https://fallout.bethesda.net</a></p><p>\u2022 Claude Tag: <a href=\"https://www.anthropic.com/news/introducing-claude-tag\" target=\"_blank\">https://www.anthropic.com/news/introducing-claude-tag</a></p><p>\u2014</p><p><strong>Recommended books:</strong></p><p>\u2022<em> Crucial Conversations: Tools for Talking When Stakes Are High</em>: <a href=\"https://www.amazon.com/dp/0071771328\" target=\"_blank\">https://www.amazon.com/dp/0071771328</a></p><p>\u2022 <em>How to Raise an Adult: Break Free of the Overparenting Trap and Prepare Your Kid for Success</em>: <a href=\"https://www.amazon.com/How-Raise-Adult-Overparenting-Prepare/dp/1627791779\" target=\"_blank\">https://www.amazon.com/How-Raise-Adult-Overparenting-Prepare/dp/1627791779</a></p><p>\u2022 <em>Incorruptible: Why Good Companies Go Bad... and How Great Companies Stay Great</em>: <a href=\"https://www.amazon.com/dp/B0FWZZBPZB\" target=\"_blank\">https://www.amazon.com/dp/B0FWZZBPZB</a></p><p>\u2014</p><p>Production and marketing by <a href=\"https://penname.co/\" target=\"_blank\">https://penname.co/</a>. For inquiries about sponsoring the podcast, email <a href=\"mailto:podcast@lennyrachitsky.com\" target=\"_blank\">podcast@lennyrachitsky.com</a>.</p><p>\u2014</p><p><em>Lenny may be an investor in the companies discussed.</em></p> <br /><br />To hear more, visit <a href=\"https://www.lennysnewsletter.com?utm_medium=podcast&#38;utm_campaign=show-notes-no-free-preview-language\">www.lennysnewsletter.com</a>",
+  "duration_seconds": 5630,
+  "transcript_path": "transcripts/lennys-podcast/2026-07-26_anthropics-first-technical-pm-on-token-maxing-the-jagged-edg.txt",
+  "transcription_source": "gpt-transcribe",
+  "summary_model": "gpt-5.6-luna",
+  "prompt_version": "v4",
+  "generated_at": "2026-09-12T17:01:32-04:00",
+  "summary": {
+    "overview": "Anthropic\u2019s Dianne Penn reflects on the company\u2019s evolution from a small research lab into a major AI company, highlighting Opus 3, coding, Claude Code, and the Labs team as key inflection points. She explains how product management is changing around rapidly improving, unpredictable models: PMs need to be hands-on, use evals to translate user feedback into model improvements, and think about what users will do as future models become more capable.",
+    "takeaways": [
+      {
+        "heading": "Anthropic\u2019s early culture",
+        "detail": "Dianne joined in 2023, when Anthropic had roughly five product engineers and one engineer supporting the entire API business. She says the company\u2019s early startup energy, strong culture, and commitment to its mission have remained central as it has grown."
+      },
+      {
+        "heading": "Finding Anthropic\u2019s identity",
+        "detail": "An early example was \u201cGolden Gate Claude,\u201d a 24-hour experiment based on interpretability research. Turning up a \u201cGolden Gate Bridge\u201d feature caused Claude to mention the bridge in every response; although only about 2,000 people saw it, the project showed Anthropic could turn research into distinctive, playful user experiences quickly."
+      },
+      {
+        "heading": "Opus 3 and coding",
+        "detail": "Training Opus 3 was an important confidence-building moment for the company. Dianne also noticed users moving beyond autocomplete to having models write long-form code, leading Anthropic to make a relatively small training change that helped Claude differentiate itself with developers."
+      },
+      {
+        "heading": "The model-product relationship",
+        "detail": "She describes Opus 4.5 and Claude Code as mutually reinforcing: Opus 4.5 provided the intelligence needed for users to experience frontier capabilities in an agentic coding product, while Claude Code gave the model a vehicle through which that capability could reach users."
+      },
+      {
+        "heading": "Operating during an exponential",
+        "detail": "Dianne says exact capability jumps are difficult to predict, so adaptability and first-principles thinking are essential. Teams need to revisit plans when new model abilities emerge, bring forward work that is suddenly possible, and help users understand what has changed."
+      },
+      {
+        "heading": "Emergent capabilities and \u201coverhang\u201d",
+        "detail": "Scaling can produce discontinuous jumps in abilities, such as suddenly becoming reliable at a task the model previously could not do. This means models may acquire capabilities that teams are not initially aware of, making evals and experimentation important for discovering what is possible."
+      },
+      {
+        "heading": "Token maxing",
+        "detail": "Dianne agrees that using models extensively is valuable, but frames token spending as an input rather than the outcome. The important result is experimentation: Anthropic\u2019s strongest prototypers spend significant time with each new research model because there is no substitute for using the technology to develop good, then great, ideas."
+      },
+      {
+        "heading": "Experimentation as a group activity",
+        "detail": "Early Anthropic employees tested Claude in public Slack channels, sharing use cases and building on one another\u2019s experiments. Dianne believes communal discovery can be more productive and enjoyable than trying to discover every use case alone."
+      },
+      {
+        "heading": "What Labs does",
+        "detail": "Labs pursues discontinuous, large bets that may not fit the core roadmap, testing whether there is \u201ca there there\u201d and what a 10x, 100x, or 1,000x version might look like. Claude Code, Skills, Claude Design, and MCP are examples she mentions."
+      },
+      {
+        "heading": "Why Labs works",
+        "detail": "Small, self-directed teams, a culture of experimentation, strong leadership from Ben, and a willingness to shut down or revisit bets help Labs move quickly. Teams can hold strong opinions about a theme while remaining flexible about the exact prototype."
+      },
+      {
+        "heading": "What AI researchers do",
+        "detail": "Researchers work on both immediate model improvements and ambitious visions of what AI could eventually do, such as using computers. Dianne\u2019s product team translates vague feedback\u2014such as \u201cClaude hallucinated\u201d\u2014into specific, actionable problems involving tool use, search, knowledge, alignment, or other capabilities."
+      },
+      {
+        "heading": "Evals as \u201cthe new PRDs\u201d",
+        "detail": "For research product managers, user feedback is converted into reproducible examples and eval sets that researchers can use to measure improvement. Dianne gives schema-following and JSON output as an example: a vague complaint about instruction-following became a concrete set of test cases."
+      },
+      {
+        "heading": "PRDs still matter",
+        "detail": "Evals do not replace PRDs in every situation. PRDs remain useful for aligning large groups around models, goals, stakeholders, and ambiguous opportunities such as computer use."
+      },
+      {
+        "heading": "Skills for successful researchers and PMs",
+        "detail": "Dianne emphasizes first-principles reasoning, ambition, passion for a research area, attention to details such as training runs and evals, and the ability to question assumptions. PMs also need to understand users deeply and express their needs in a form that partner teams can act on."
+      },
+      {
+        "heading": "Hands-on product leadership",
+        "detail": "Managers and senior PMs should not merely tinker with AI; they should ship with it, read user feedback, and stay close to the changing capabilities. Dianne says Anthropic gives experienced hires the same hands-on onboarding expectations as early-career employees."
+      },
+      {
+        "heading": "Finding enjoyment in AI work",
+        "detail": "She recommends pairing with people who are excited about the technology and going deep on one or two tools rather than trying to keep up with everything. She also uses Claude to prepare for difficult management conversations, including through a custom skill inspired by Crucial Conversations."
+      },
+      {
+        "heading": "AI, judgment, and writing",
+        "detail": "Dianne advises forming one\u2019s own point of view before asking Claude to critique or extend it, so the model augments rather than replaces personal judgment. She says writing, tone, and character remain active areas for improvement, and that who verifies and signs off on AI-generated work may matter more than who wrote it."
+      },
+      {
+        "heading": "Human strengths and children\u2019s education",
+        "detail": "She expects judgment, persistence, proactivity, subject-matter expertise, and the ability to think ambitiously to remain valuable. For her children, she prioritizes curiosity, persistence, an inner voice, opinions, and an individual perspective."
+      },
+      {
+        "heading": "Avoiding burnout",
+        "detail": "Dianne says the pace is sustainable only through teamwork, shared ownership, and colleagues who step in to support one another. She describes Anthropic\u2019s culture as involving \u201cmind melding\u201d or entering a \u201chive mind,\u201d rather than carrying the responsibility alone."
+      },
+      {
+        "heading": "Her career lesson",
+        "detail": "From working as a high-yield bond trader at J.P. Morgan, Dianne learned to develop an authentic voice, have conviction in good ideas regardless of seniority or background, and follow through on the detailed work required to make them real."
+      }
+    ],
+    "quotes": [
+      {
+        "text": "Evals are the new PRDs.",
+        "speaker": null
+      },
+      {
+        "text": "You have to sweat the tokens as much as you sweat the pixels.",
+        "speaker": null
+      },
+      {
+        "text": "No matter how far you go, there\u2019s always another level.",
+        "speaker": null
+      },
+      {
+        "text": "Experimentation is not an individual sport.",
+        "speaker": null
+      }
+    ],
+    "resources": [
+      {
+        "name": "How to Raise an Adult by Julie Lythcott-Haims",
+        "kind": "book"
+      },
+      {
+        "name": "Incorruptible by Eric Ries",
+        "kind": "book"
+      },
+      {
+        "name": "Crucial Conversations",
+        "kind": "book"
+      },
+      {
+        "name": "Fallout",
+        "kind": "show"
+      }
+    ]
+  }
+}

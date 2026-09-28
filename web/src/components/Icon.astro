@@ -1,0 +1,21 @@
+---
+// Small stroke icon set, so pages don't pull in an icon library.
+interface Props { name: 'list' | 'bookmark' | 'mic' | 'search' | 'chevron-right' | 'chevron-left' | 'chevron-down' | 'play' | 'quote' | 'external'; size?: number; }
+const { name, size = 18 } = Astro.props;
+---
+{name === 'play' ? (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" /></svg>
+) : name === 'quote' ? (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 18v-5c0-4 2-7 6-8l1 2c-2 1-3 3-3 5h3v6zm9 0v-5c0-4 2-7 6-8l1 2c-2 1-3 3-3 5h3v6z" /></svg>
+) : (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    {name === 'list' && <><path d="M4 5h16" /><path d="M4 12h16" /><path d="M4 19h10" /></>}
+    {name === 'bookmark' && <path d="M6 3h12v18l-6-4-6 4z" />}
+    {name === 'mic' && <><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0" /><path d="M12 18v3" /></>}
+    {name === 'search' && <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>}
+    {name === 'chevron-right' && <path d="m9 6 6 6-6 6" />}
+    {name === 'chevron-left' && <path d="m15 18-6-6 6-6" />}
+    {name === 'chevron-down' && <path d="m6 9 6 6 6-6" />}
+    {name === 'external' && <><path d="M14 4h6v6" /><path d="M20 4 10 14" /><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5" /></>}
+  </svg>
+)}
