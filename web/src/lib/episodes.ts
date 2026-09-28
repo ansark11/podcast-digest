@@ -55,9 +55,13 @@ export function formatDate(iso: string | null, withYear = false): string {
 
 export function formatDuration(seconds: number | null | undefined): string | null {
   if (!seconds) return null;
-  const h = Math.floor(seconds / 3600);
-  const m = Math.round((seconds % 3600) / 60);
-  return h ? `${h} hr ${m} min` : `${m} min`;
+  // Round to whole minutes first, so 59.5+ minutes carries into the hour
+  // instead of showing "1 hr 60 min".
+  const total = Math.max(1, Math.round(seconds / 60));
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  if (!h) return `${m} min`;
+  return m ? `${h} hr ${m} min` : `${h} hr`;
 }
 
 /** Reading time at ~230 words per minute. */
