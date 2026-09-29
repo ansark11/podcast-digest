@@ -66,7 +66,7 @@ def main(tag, show_filter):
             "prompt": prompt,
             "transcript": transcript,
             # The judge grades plain text, so every eval run carries the same
-            # rendering the digest email uses, plus the structured original.
+            # plain-text rendering, plus the structured original.
             "summary": pd.render_summary_text(summary),
             "summary_structured": summary,
             "processed_at": time.strftime("%Y%m%d_%H%M%S"),

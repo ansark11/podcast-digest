@@ -1,7 +1,8 @@
 """
-Backfill: summarize past episodes into summaries/ (and transcripts/) without
-sending a digest email. Use it to populate the app with older episodes, or to
-give the eval tooling more source material.
+Backfill: summarize past episodes into summaries/ (and transcripts/),
+including ones older than the weekly run's lookback window. Use it to
+populate the app with older episodes, or to give the eval tooling more
+source material.
 
 Usage:
   python scripts/backfill.py --count 12
@@ -15,29 +16,24 @@ import podcast_digest as pd
 
 def backfill(show_name_filter, count):
     shows = pd.load_json(pd.SHOWS_FILE, [])
-    seen = pd.load_json(pd.STATE_FILE, {})
 
     for show in shows:
         name = show["name"]
         if show_name_filter and name != show_name_filter:
             continue
 
-        seen_guids = set(seen.get(name, []))
-        episodes = pd.get_latest_episodes(show["rss_url"], limit=count + len(seen_guids) + 5)
-        candidates = [e for e in episodes if e["guid"] not in seen_guids][:count]
+        # Each episode's summary file is written as soon as it's done, so an
+        # interrupted run loses nothing completed — re-running the same
+        # command just picks up where it left off.
+        done = pd.summarized_guids(name)
+        episodes = pd.get_latest_episodes(show["rss_url"], limit=count + len(done) + 5)
+        candidates = [e for e in episodes if e["guid"] not in done][:count]
 
         print(f"Backfilling {len(candidates)} episode(s) for {name}")
         for ep in candidates:
             print(f"Processing: {name} — {ep['title']}")
             try:
                 pd.process_episode(name, ep)
-                seen_guids.add(ep["guid"])
-                # Checkpoint after every episode, not just at the end, so a
-                # dropped connection or interrupted run loses nothing already
-                # completed — re-running the same command just picks up
-                # where it left off.
-                seen[name] = list(seen_guids)
-                pd.save_json(pd.STATE_FILE, seen)
             except Exception as e:
                 print(f"  Failed: {e}")
 

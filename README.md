@@ -1,11 +1,11 @@
 # Podcast Digest
 
-Daily pipeline that checks a fixed list of podcasts for new episodes,
-transcribes them (using the feed's own published transcript when one is
-freely available, otherwise OpenAI's gpt-transcribe), summarizes them
-into key points (GPT-5.6 Luna), saves each summary to `summaries/`, and
-emails you a digest. Runs
-automatically on GitHub Actions — no server or laptop needs to stay on.
+Weekly pipeline that checks a fixed list of podcasts for episodes from the
+last two weeks, transcribes them (using the feed's own published transcript
+when one is freely available, otherwise OpenAI's gpt-transcribe), summarizes
+them into key points (GPT-5.6 Luna), and saves each summary to `summaries/`
+for the web app. Runs automatically on GitHub Actions — no server or laptop
+needs to stay on.
 
 **Note:** this only works for shows with a public RSS feed. Spotify
 Originals/exclusives don't publish one, so they can't be pulled this way.
@@ -28,24 +28,16 @@ shows:
 ]
 ```
 
-### 3. Get your API keys
-- **OpenAI API key** (for transcription and summarization): platform.openai.com → API keys
-- **Gmail app password** (for sending the email): Google Account →
-  Security → 2-Step Verification → App passwords. Generate one for "Mail".
-  (Your normal Gmail password won't work here — Google requires an app
-  password for programmatic SMTP access.)
+### 3. Get an OpenAI API key
+For transcription and summarization: platform.openai.com → API keys
 
-### 4. Add secrets to your GitHub repo
+### 4. Add the key to your GitHub repo
 Push this project to a new GitHub repo, then go to:
 **Settings → Secrets and variables → Actions → New repository secret**
+and add `OPENAI_API_KEY`.
 
-Add each of these:
-| Secret name | Value |
-|---|---|
-| `OPENAI_API_KEY` | your OpenAI key |
-| `GMAIL_ADDRESS` | the Gmail address to send from |
-| `GMAIL_APP_PASSWORD` | the app password from step 3 |
-| `DIGEST_TO_EMAIL` | where the digest should be sent (can be the same address) |
+Scheduled workflows only run from the repo's default branch, so make sure
+that's `main` (**Settings → General → Default branch**).
 
 ### 5. Commit `config/shows.json`
 Make sure your filled-in `config/shows.json` is committed. Unlike API keys,
@@ -59,13 +51,12 @@ waiting for the schedule.
 ## Project layout
 ```
 config/shows.json          shows to follow (name + RSS feed)
-state/seen_episodes.json   episodes already processed
 summaries/<show>/*.json    one structured summary per episode (read by the web app)
 transcripts/<show>/*.txt   the transcript each summary was made from
 web/                       the reading app (Astro), deployed on Vercel
 scripts/
-  podcast_digest.py        production pipeline (run daily by GitHub Actions)
-  backfill.py              summarize older episodes into summaries/, no email
+  podcast_digest.py        production pipeline (run weekly by GitHub Actions)
+  backfill.py              summarize older episodes into summaries/
   evals/                   eval tooling, never writes to summaries/
 evals/                     gitignored: experimental takes, judge scores, reports
 ```
@@ -78,7 +69,7 @@ progress and saves are stored in the browser, so they don't sync between
 devices.
 
 Vercel deploys it (project Root Directory: `web`) and rebuilds on every
-push, including the pipeline's daily commit, so new summaries appear on
+push, including the pipeline's weekly commit, so new summaries appear on
 their own. To run it locally:
 ```bash
 cd web
@@ -139,11 +130,15 @@ A take only becomes the official summary when the production pipeline
 produces it. Eval scripts never promote anything on their own.
 
 ## How it works
-1. GitHub Actions runs `scripts/podcast_digest.py` on a cron schedule
-   (default: 9am ET daily — edit the `cron` line in
-   `.github/workflows/podcast-digest.yml` to change it)
-2. For each show, it checks the RSS feed for episodes not yet in
-   `state/seen_episodes.json`
+1. GitHub Actions runs `scripts/podcast_digest.py` every Friday at 9am
+   Eastern (see `.github/workflows/podcast-digest.yml`). It runs on GitHub's
+   servers, so it doesn't depend on any machine being on. You can also
+   start it from the Actions tab → "Podcast Digest" → **Run workflow**
+2. For each show, it takes the RSS feed's episodes from the last 14 days
+   (`LOOKBACK_DAYS`) and skips any that already have a file in
+   `summaries/`. An episode that failed has no file, so the next run
+   retries it while it's still in the window. For anything older, use
+   `scripts/backfill.py`
 3. If the feed publishes a usable `<podcast:transcript>` for an episode,
    that's used directly. Otherwise the audio is downloaded and
    transcribed with gpt-transcribe (chunked automatically if over the
@@ -151,10 +146,9 @@ produces it. Eval scripts never promote anything on their own.
    accuracy on names and terms
 4. Each transcript is summarized with GPT-5.6 Luna into structured JSON.
    The summary goes to `summaries/` and the transcript to `transcripts/`
-5. If anything new was found, one digest email is sent covering all of it
-6. `state/seen_episodes.json`, `summaries/` and `transcripts/` are committed
-   back to the repo, so the same episode is never processed twice and every
-   summary is kept permanently
+5. `summaries/` and `transcripts/` are committed back to `main`, so every
+   summary is kept permanently. That push makes Vercel rebuild the web app,
+   so new summaries appear without a manual deploy
 
 ## Costs
 gpt-transcribe is about $0.0045/minute of audio (only charged when a
@@ -166,6 +160,6 @@ input/output tokens) is under a cent per episode.
 ## Local testing
 ```bash
 pip install -r requirements.txt
-cp .env.example .env   # then fill in your keys/password — .env is gitignored
+cp .env.example .env   # then fill in your key — .env is gitignored
 python scripts/podcast_digest.py
 ```
