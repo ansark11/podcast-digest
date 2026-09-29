@@ -255,15 +255,21 @@ const toc = [
     const article = reader.querySelector<HTMLElement>('.article')!;
     const bar = reader.querySelector<HTMLElement>('[data-read-bar]');
     let best = load().progress[id] ?? 0;
-    const onScroll = () => {
+    // Only a real scroll counts as reading: painting the bar on page load must
+    // not record progress, or a summary that fits on screen would be marked
+    // finished the moment it's opened.
+    const onScroll = (record: boolean) => {
       const rect = article.getBoundingClientRect();
       const total = rect.height - window.innerHeight * 0.6;
-      const p = total <= 0 ? 1 : Math.min(1, Math.max(0, -rect.top / total));
+      // Hitting the bottom of the page counts as done: on wide screens the
+      // article's end can't scroll far enough up for the ratio to reach 1.
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+      const p = total <= 0 || atBottom ? 1 : Math.min(1, Math.max(0, -rect.top / total));
       if (bar) bar.style.width = `${Math.round(p * 100)}%`;
-      if (p > best + 0.02 || (p >= 0.99 && best < 1)) { best = p; setProgress(id, p); }
+      if (record && (p > best + 0.02 || (p >= 0.99 && best < 1))) { best = p; setProgress(id, p); }
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    window.addEventListener('scroll', () => onScroll(true), { passive: true });
+    onScroll(false);
 
     // Highlight the section you're reading in "On this page"
     const links = new Map([...reader.querySelectorAll<HTMLAnchorElement>('[data-toc]')].map((a) => [a.dataset.toc!, a]));
