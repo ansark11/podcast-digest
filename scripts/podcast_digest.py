@@ -134,9 +134,30 @@ def _show_artwork(feed):
     return image.get("href") if isinstance(image, dict) else None
 
 
+# Some hosts refuse feedparser's default user agent from datacenter IPs.
+FEED_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; podcast-digest/1.0; +https://github.com/ansark11/podcast-digest)"}
+
+
+def fetch_feed(rss_url):
+    """Fetch and parse a show's RSS feed, failing loudly if it can't be read.
+
+    feedparser.parse(url) returns an empty feed instead of raising on an HTTP
+    error or a blocked request, which looks exactly like "no new episodes".
+    """
+    response = requests.get(rss_url, headers=FEED_HEADERS, timeout=60)
+    response.raise_for_status()
+    feed = feedparser.parse(response.content)
+    if not feed.entries:
+        raise RuntimeError(
+            f"Feed has no episodes: {rss_url} (HTTP {response.status_code}, "
+            f"{len(response.content)} bytes, content-type {response.headers.get('content-type')})"
+        )
+    return feed
+
+
 def get_latest_episodes(rss_url, limit=None):
     """Pull episodes from a show's RSS feed, newest first (all of them unless `limit` is set)."""
-    feed = feedparser.parse(rss_url)
+    feed = fetch_feed(rss_url)
     show_artwork_url = _show_artwork(feed)
     episodes = []
     for entry in feed.entries[:limit]:
@@ -481,7 +502,7 @@ def refresh_metadata(shows):
         if not stale:
             continue
 
-        feed = feedparser.parse(show["rss_url"])
+        feed = fetch_feed(show["rss_url"])
         show_artwork_url = _show_artwork(feed)
         by_guid = {e.get("id", e.get("link")): e for e in feed.entries}
         updated = 0
@@ -533,8 +554,14 @@ def main():
     for show in shows:
         name = show["name"]
         done = summarized_guids(name)
+        try:
+            episodes = get_latest_episodes(show["rss_url"])
+        except Exception as e:
+            print(f"Failed to read the feed for {name}: {e}")
+            failed += 1
+            continue
         recent = []
-        for ep in get_latest_episodes(show["rss_url"]):
+        for ep in episodes:
             published = to_iso_date(ep.get("published", ""))
             if published is None:
                 print(f"Skipping {name} — {ep['title']}: no parseable publish date")
