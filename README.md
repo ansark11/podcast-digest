@@ -4,8 +4,8 @@ Weekly pipeline that checks a fixed list of podcasts for episodes from the
 last two weeks, transcribes them (using the feed's own published transcript
 when one is freely available, otherwise OpenAI's gpt-transcribe), summarizes
 them into key points (GPT-5.6 Luna), and saves each summary to `summaries/`
-for the web app. Runs automatically on GitHub Actions — no server or laptop
-needs to stay on.
+for the web app. Runs weekly on your Mac via launchd (GitHub's runners are
+blocked by Substack, so they can't fetch Lenny's Podcast).
 
 **Note:** this only works for shows with a public RSS feed. Spotify
 Originals/exclusives don't publish one, so they can't be pulled this way.
@@ -28,25 +28,31 @@ shows:
 ]
 ```
 
-### 3. Get an OpenAI API key
-For transcription and summarization: platform.openai.com → API keys
+### 3. Add your OpenAI API key
+For transcription and summarization: platform.openai.com → API keys.
+Put it in `.env` (`cp .env.example .env`; `.env` is gitignored).
 
-### 4. Add the key to your GitHub repo
-Push this project to a new GitHub repo, then go to:
-**Settings → Secrets and variables → Actions → New repository secret**
-and add `OPENAI_API_KEY`.
-
-Scheduled workflows only run from the repo's default branch, so make sure
-that's `main` (**Settings → General → Default branch**).
+### 4. Install the weekly job
+```bash
+scripts/scheduler/install.sh
+```
+This sets up a launchd job that runs every Friday at 9:00 local time. It runs
+from its own clone of `main` in `~/Library/Application Support/podcast-digest`
+(background jobs can't read `~/Documents`), so it never touches your working
+copy. Re-run the installer after changing `.env`.
 
 ### 5. Commit `config/shows.json`
 Make sure your filled-in `config/shows.json` is committed. Unlike API keys,
 it's not a secret.
 
 ### 6. Test it
-Go to the **Actions** tab in your repo → "Podcast Digest" workflow →
-**Run workflow** to trigger it manually and confirm it works before
-waiting for the schedule.
+Run it once now instead of waiting for Friday (the installer prints the
+exact command):
+```bash
+~/Library/Application\ Support/podcast-digest/venv/bin/python \
+  ~/Library/Application\ Support/podcast-digest/repo/scripts/scheduler/weekly_run.py --force
+```
+Output goes to `~/Library/Logs/podcast-digest/run.log`.
 
 ## Project layout
 ```
@@ -55,7 +61,8 @@ summaries/<show>/*.json    one structured summary per episode (read by the web a
 transcripts/<show>/*.txt   the transcript each summary was made from
 web/                       the reading app (Astro), deployed on Vercel
 scripts/
-  podcast_digest.py        production pipeline (run weekly by GitHub Actions)
+  podcast_digest.py        production pipeline
+  scheduler/               weekly launchd job for the Mac (install.sh, weekly_run.py)
   backfill.py              summarize older episodes into summaries/
   evals/                   eval tooling, never writes to summaries/
 evals/                     gitignored: experimental takes, judge scores, reports
@@ -130,10 +137,10 @@ A take only becomes the official summary when the production pipeline
 produces it. Eval scripts never promote anything on their own.
 
 ## How it works
-1. GitHub Actions runs `scripts/podcast_digest.py` every Friday at 9am
-   Eastern (see `.github/workflows/podcast-digest.yml`). It runs on GitHub's
-   servers, so it doesn't depend on any machine being on. You can also
-   start it from the Actions tab → "Podcast Digest" → **Run workflow**
+1. launchd starts `scripts/scheduler/weekly_run.py` every Friday at 9:00.
+   If the Mac is asleep then, it runs on wake; if it was off, at the next
+   login; if it's offline, it retries hourly until it gets through. A macOS
+   notification reports new summaries or errors
 2. For each show, it takes the RSS feed's episodes from the last 14 days
    (`LOOKBACK_DAYS`) and skips any that already have a file in
    `summaries/`. An episode that failed has no file, so the next run
@@ -146,9 +153,9 @@ produces it. Eval scripts never promote anything on their own.
    accuracy on names and terms
 4. Each transcript is summarized with GPT-5.6 Luna into structured JSON.
    The summary goes to `summaries/` and the transcript to `transcripts/`
-5. `summaries/` and `transcripts/` are committed back to `main`, so every
-   summary is kept permanently. That push makes Vercel rebuild the web app,
-   so new summaries appear without a manual deploy
+5. `summaries/` and `transcripts/` are committed and pushed to `main`, so
+   every summary is kept permanently. That push makes Vercel rebuild the
+   web app, so new summaries appear without a manual deploy
 
 ## Costs
 gpt-transcribe is about $0.0045/minute of audio (only charged when a

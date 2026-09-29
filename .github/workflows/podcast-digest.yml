@@ -1,13 +1,10 @@
 name: Podcast Digest
 
+# The weekly schedule runs on a Mac (scripts/scheduler/), not here: Substack
+# returns 403 to GitHub's runners, so this fails for Substack-hosted shows
+# like Lenny's Podcast. Kept as a manual run for shows hosted elsewhere.
 on:
-  schedule:
-    # Fridays at 9am Eastern. GitHub cron is UTC-only, so both offsets are
-    # scheduled (13:00 UTC = 9am EDT, 14:00 UTC = 9am EST) and the gate job
-    # below lets through only the one that matches the current season.
-    - cron: "0 13 * * 5"
-    - cron: "0 14 * * 5"
-  workflow_dispatch: {}  # lets you trigger a run manually from the Actions tab
+  workflow_dispatch: {}
 
 # Never run two at once: both would pick the same episodes and push.
 concurrency:
@@ -15,26 +12,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  gate:
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.check.outputs.run }}
-    steps:
-      - id: check
-        # Compares against the schedule that fired rather than the clock, so a
-        # run GitHub starts late still counts.
-        run: |
-          if [ "${{ github.event_name }}" != "schedule" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
-          fi
-          if [ "$(TZ=America/Toronto date +%Z)" = "EDT" ]; then want="0 13 * * 5"; else want="0 14 * * 5"; fi
-          if [ "${{ github.event.schedule }}" = "$want" ]; then run=true; else run=false; fi
-          echo "Fired: '${{ github.event.schedule }}', 9am Eastern today is '$want' -> run=$run"
-          echo "run=$run" >> "$GITHUB_OUTPUT"
-
   run-digest:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write  # needed to commit the new summaries back
