@@ -1,12 +1,13 @@
 """
 Podcast Digest Pipeline
 ------------------------
-Checks a fixed list of podcast RSS feeds for new episodes. If a feed
-publishes a usable Podcasting 2.0 <podcast:transcript> tag, that's used
-directly; otherwise audio is downloaded and transcribed with OpenAI's
-gpt-transcribe. Each transcript is summarized with GPT-5.6 Luna, and
-one digest email covers everything new. Designed to run on a schedule
-via GitHub Actions (see .github/workflows/podcast-digest.yml).
+Checks a fixed list of podcast RSS feeds for episodes published in the
+last LOOKBACK_DAYS that don't have a summary yet. If a feed publishes a
+usable Podcasting 2.0 <podcast:transcript> tag, that's used directly;
+otherwise audio is downloaded and transcribed with OpenAI's
+gpt-transcribe. Each transcript is summarized with GPT-5.6 Luna. Runs
+weekly on GitHub Actions (see .github/workflows/podcast-digest.yml); the
+committed summaries are what the web app shows.
 
 Each processed episode produces two committed files, one per episode:
   summaries/<show>/<date>_<slug>.json   structured summary + episode metadata
@@ -16,11 +17,8 @@ Re-processing an episode overwrites its files (matched by guid), so there
 is only ever one summary per episode. Experimental re-summaries for evals
 live separately under evals/ (see scripts/evals/).
 
-Required environment variables (set as GitHub Actions secrets):
+Required environment variables (set as a GitHub Actions secret):
   OPENAI_API_KEY       - OpenAI API key (transcription and summarization)
-  GMAIL_ADDRESS        - Gmail address to send from
-  GMAIL_APP_PASSWORD   - Gmail app password (not your normal password)
-  DIGEST_TO_EMAIL      - Where the digest should be sent
 """
 
 import os
@@ -29,12 +27,9 @@ import json
 import time
 import argparse
 import unicodedata
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
-import smtplib
 import tempfile
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from pathlib import Path
 
 import feedparser
@@ -47,13 +42,13 @@ from pydub.utils import make_chunks
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 SHOWS_FILE = BASE_DIR / "config" / "shows.json"
-STATE_FILE = BASE_DIR / "state" / "seen_episodes.json"
 SUMMARIES_DIR = BASE_DIR / "summaries"
 TRANSCRIPTS_DIR = BASE_DIR / "transcripts"
 
 TRANSCRIPTION_MAX_BYTES = 24 * 1024 * 1024  # stay safely under the 25MB API limit
 CHUNK_MS = 10 * 60 * 1000                   # split long episodes into 10-minute chunks
-MAX_NEW_EPISODES_PER_SHOW = 3               # safety cap per run, per show
+LOOKBACK_DAYS = 14                          # each run picks up episodes published this recently
+MAX_NEW_EPISODES_PER_SHOW = 5               # safety cap per run, per show
 MAX_TRANSCRIPT_CHARS = 400_000              # well under Luna's ~1M token context window
 MIN_FEED_TRANSCRIPT_CHARS = 500             # below this, treat a feed transcript as bogus/placeholder
 TRANSCRIPTION_MODEL = "gpt-transcribe"
@@ -139,9 +134,30 @@ def _show_artwork(feed):
     return image.get("href") if isinstance(image, dict) else None
 
 
-def get_latest_episodes(rss_url, limit=MAX_NEW_EPISODES_PER_SHOW):
-    """Pull the most recent episodes from a show's RSS feed."""
-    feed = feedparser.parse(rss_url)
+# Some hosts refuse feedparser's default user agent from datacenter IPs.
+FEED_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; podcast-digest/1.0; +https://github.com/ansark11/podcast-digest)"}
+
+
+def fetch_feed(rss_url):
+    """Fetch and parse a show's RSS feed, failing loudly if it can't be read.
+
+    feedparser.parse(url) returns an empty feed instead of raising on an HTTP
+    error or a blocked request, which looks exactly like "no new episodes".
+    """
+    response = requests.get(rss_url, headers=FEED_HEADERS, timeout=60)
+    response.raise_for_status()
+    feed = feedparser.parse(response.content)
+    if not feed.entries:
+        raise RuntimeError(
+            f"Feed has no episodes: {rss_url} (HTTP {response.status_code}, "
+            f"{len(response.content)} bytes, content-type {response.headers.get('content-type')})"
+        )
+    return feed
+
+
+def get_latest_episodes(rss_url, limit=None):
+    """Pull episodes from a show's RSS feed, newest first (all of them unless `limit` is set)."""
+    feed = fetch_feed(rss_url)
     show_artwork_url = _show_artwork(feed)
     episodes = []
     for entry in feed.entries[:limit]:
@@ -388,7 +404,7 @@ def summarize_transcript(prompt):
 
 
 def render_summary_text(summary):
-    """Plain-text version of a structured summary, for the email and the eval judge."""
+    """Plain-text version of a structured summary, for the eval judge."""
     lines = [summary["overview"], ""]
     for t in summary["takeaways"]:
         lines.append(f"- {t['heading']}: {t['detail']}" if t.get("heading") else f"- {t['detail']}")
@@ -399,6 +415,16 @@ def render_summary_text(summary):
     if summary["resources"]:
         lines += ["", "Resources mentioned: " + ", ".join(r["name"] for r in summary["resources"])]
     return "\n".join(lines)
+
+
+def summarized_guids(show_name):
+    """Guids of every episode of this show that already has a summary file.
+
+    The summary files are the record of what's been processed: an episode
+    whose run failed has no file, so the next run picks it up again.
+    """
+    show_dir = SUMMARIES_DIR / slugify(show_name)
+    return {load_json(p, {}).get("guid") for p in show_dir.glob("*.json")} if show_dir.exists() else set()
 
 
 def find_summary_path(show_slug, guid):
@@ -476,7 +502,7 @@ def refresh_metadata(shows):
         if not stale:
             continue
 
-        feed = feedparser.parse(show["rss_url"])
+        feed = fetch_feed(show["rss_url"])
         show_artwork_url = _show_artwork(feed)
         by_guid = {e.get("id", e.get("link")): e for e in feed.entries}
         updated = 0
@@ -495,25 +521,6 @@ def refresh_metadata(shows):
                 save_json(path, record)
                 updated += 1
         print(f"Metadata: updated {updated} of {len(stale)} incomplete summary file(s) for {show['name']}")
-
-
-def send_digest_email(digest_sections):
-    sender = os.environ["GMAIL_ADDRESS"]
-    password = os.environ["GMAIL_APP_PASSWORD"]
-    recipient = os.environ["DIGEST_TO_EMAIL"]
-
-    msg = MIMEMultipart()
-    msg["From"] = sender
-    msg["To"] = recipient
-    msg["Subject"] = f"Podcast digest — {time.strftime('%Y-%m-%d')}"
-
-    body = "\n\n".join(digest_sections)
-    msg.attach(MIMEText(body, "plain"))
-
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
-        server.starttls()
-        server.login(sender, password)
-        server.send_message(msg)
 
 
 def process_episode(show_name, episode):
@@ -541,42 +548,52 @@ def main():
         print("No shows configured in config/shows.json — nothing to do.")
         return
 
-    seen = load_json(STATE_FILE, {})
-    digest_sections = []
+    cutoff = datetime.now(timezone.utc) - timedelta(days=LOOKBACK_DAYS)
+    processed, failed = 0, 0
 
     for show in shows:
         name = show["name"]
-        rss_url = show["rss_url"]
-        seen_guids = set(seen.get(name, []))
+        done = summarized_guids(name)
+        try:
+            episodes = get_latest_episodes(show["rss_url"])
+        except Exception as e:
+            print(f"Failed to read the feed for {name}: {e}")
+            failed += 1
+            continue
+        recent = []
+        for ep in episodes:
+            published = to_iso_date(ep.get("published", ""))
+            if published is None:
+                print(f"Skipping {name} — {ep['title']}: no parseable publish date")
+            elif datetime.fromisoformat(published) >= cutoff:
+                recent.append(ep)
 
-        episodes = get_latest_episodes(rss_url)
-        new_episodes = [e for e in episodes if e["guid"] not in seen_guids]
+        todo = [e for e in recent if e["guid"] not in done]
+        print(f"{name}: {len(recent)} episode(s) in the last {LOOKBACK_DAYS} days, {len(todo)} without a summary")
+        if len(todo) > MAX_NEW_EPISODES_PER_SHOW:
+            print(f"  Capping at {MAX_NEW_EPISODES_PER_SHOW}; the rest wait for the next run")
+            todo = todo[:MAX_NEW_EPISODES_PER_SHOW]
 
-        for ep in new_episodes:
-            print(f"Processing new episode: {name} — {ep['title']}")
+        for ep in todo:
+            print(f"Processing: {name} — {ep['title']}")
             try:
-                summary = process_episode(name, ep)
-                link = f"\n{ep['episode_url']}" if ep.get("episode_url") else ""
-                digest_sections.append(f"=== {name}: {ep['title']} ==={link}\n\n{render_summary_text(summary)}")
-                seen_guids.add(ep["guid"])
+                process_episode(name, ep)
+                processed += 1
             except Exception as e:
                 # Don't let one bad episode kill the whole run
                 print(f"Failed to process {name} — {ep['title']}: {e}")
-
-        seen[name] = list(seen_guids)
-
-    if digest_sections:
-        send_digest_email(digest_sections)
-        print(f"Sent digest with {len(digest_sections)} episode(s).")
-    else:
-        print("No new episodes found.")
-
-    save_json(STATE_FILE, seen)
+                failed += 1
 
     try:
         refresh_metadata(shows)
     except Exception as e:
         print(f"Metadata refresh failed (summaries are unaffected): {e}")
+
+    print(f"Done: {processed} new summary file(s), {failed} failure(s).")
+    if failed:
+        # Summaries that did succeed are still committed by the workflow;
+        # this just marks the run red so a failure doesn't go unnoticed.
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

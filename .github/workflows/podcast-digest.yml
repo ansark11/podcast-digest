@@ -1,17 +1,21 @@
 name: Podcast Digest
 
+# The weekly schedule runs on a Mac (scripts/scheduler/), not here: Substack
+# returns 403 to GitHub's runners, so this fails for Substack-hosted shows
+# like Lenny's Podcast. Kept as a manual run for shows hosted elsewhere.
 on:
-  schedule:
-    # Runs at 13:00 UTC daily = 9am ET / 8am CT.
-    # Adjust to your timezone: cron times are always UTC.
-    - cron: "0 13 * * *"
-  workflow_dispatch: {}  # lets you trigger a run manually from the Actions tab
+  workflow_dispatch: {}
+
+# Never run two at once: both would pick the same episodes and push.
+concurrency:
+  group: podcast-digest
+  cancel-in-progress: false
 
 jobs:
   run-digest:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # needed to commit the updated state file back
+      contents: write  # needed to commit the new summaries back
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,21 +31,21 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run podcast digest
+      - name: Summarize episodes from the last 2 weeks
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          DIGEST_TO_EMAIL: ${{ secrets.DIGEST_TO_EMAIL }}
         run: python scripts/podcast_digest.py
 
       # Summaries and transcripts are committed so they persist between runs
-      # (the runner's disk is wiped) and so the web app can read them.
-      - name: Commit new summaries, transcripts and state
+      # (the runner's disk is wiped). The push to main is what makes Vercel
+      # rebuild the web app with the new summaries.
+      - name: Commit new summaries and transcripts
         if: always()
         run: |
           git config user.name "podcast-digest-bot"
           git config user.email "actions@github.com"
-          git add state/seen_episodes.json summaries/ transcripts/
-          git diff --staged --quiet || git commit -m "Add podcast summaries and update state"
+          git add summaries/ transcripts/
+          git diff --staged --quiet && exit 0
+          git commit -m "Add podcast summaries"
+          git pull --rebase
           git push
