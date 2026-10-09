@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "guid": "substack:post:217274136",
+  "show": "Lenny's Podcast",
+  "show_slug": "lennys-podcast",
+  "episode_title": "OpenAI\u2019s Head of ChatGPT: We\u2019re entering a new era of AI (again) | Tibo Sottiaux",
+  "published": "2026-10-04T12:32:47+00:00",
+  "audio_url": "https://pscrb.fm/rss/p/api.substack.com/feed/podcast/217274136/13e3f49711c936b294b6ef27d4160818.mp3",
+  "episode_url": "https://www.lennysnewsletter.com/p/openais-head-of-chatgpt-were-entering",
+  "artwork_url": "https://substackcdn.com/feed/podcast/10845/post/217274136/b971117469af0222fb889b6b351aed06.jpg",
+  "description_html": "<p><strong>Tibo Sottiaux</strong> leads ChatGPT and Codex at OpenAI. Under his stewardship, OpenAI has shipped some of its most consequential consumer launches: Codex, ChatGPT Work, and most recently, the new Dots personal agent platform. He joined me at DevDay, hours after his team launched more than 20 new products, to talk about where things are heading.</p><p></p><p><strong>We discuss:</strong></p><p>1. Dots, OpenAI\u2019s new personal AI assistant</p><p>2. Why most actions on the internet will soon be taken by agents</p><p>3. Why loops, graphs, and fine-tuning agent workflows are a passing phase</p><p>4. Which skills are trending up and down in the AI era</p><p>5. How Tibo\u2019s Dot warned him about a production outage five minutes before the launch</p><p>6. OpenAI\u2019s approach to AI safety</p><p>\u2014</p><p><strong>Brought to you by:</strong></p><p><a href=\"https://workos.com/lenny\" target=\"_blank\"><strong>WorkOS</strong></a>\u2014Make your app enterprise-ready, with SSO, SCIM, RBAC, and more</p><p><a href=\"https://getdx.com/?utm_source=lenny&#38;utm_medium=sponsorship&#38;utm_campaign=q42026\" target=\"_blank\"><strong>DX</strong></a>\u2014Engineering intelligence for the AI era</p><p>\u2014</p><p><strong>Episode transcript:</strong> <a href=\"https://www.lennysnewsletter.com/p/openais-head-of-chatgpt-were-entering\" target=\"_blank\">https://www.lennysnewsletter.com/p/openais-head-of-chatgpt-were-entering</a></p><p>\u2014</p><p><strong>Archive of all Lenny's Podcast transcripts: </strong><a href=\"https://www.dropbox.com/scl/fo/yxi4s2w998p1gvtpu4193/AMdNPR8AOw0lMklwtnC0TrQ?rlkey=j06x0nipoti519e0xgm23zsn9&#38;st=ahz0fj11&#38;dl=0\" target=\"_blank\">https://www.dropbox.com/scl/fo/yxi4s2w998p1gvtpu4193/AMdNPR8AOw0lMklwtnC0TrQ?rlkey=j06x0nipoti519e0xgm23zsn9&amp;st=ahz0fj11&amp;dl=0</a></p><p>\u2014</p><p><strong>Where to find Tibo Sottiaux:</strong></p><p>\u2022 X: <a href=\"https://x.com/thsottiaux\" target=\"_blank\">https://x.com/thsottiaux</a></p><p>\u2022 LinkedIn: <a href=\"https://www.linkedin.com/in/thibault-sottiaux-27195366\" target=\"_blank\">https://www.linkedin.com/in/thibault-sottiaux-27195366</a></p><p>\u2014</p><p><strong>Where to find Lenny:</strong></p><p>\u2022 Newsletter: <a href=\"https://www.lennysnewsletter.com\" target=\"_blank\">https://www.lennysnewsletter.com</a></p><p>\u2022 X: <a href=\"https://twitter.com/lennysan\" target=\"_blank\">https://twitter.com/lennysan</a></p><p>\u2022 LinkedIn: <a href=\"https://www.linkedin.com/in/lennyrachitsky/\" target=\"_blank\">https://www.linkedin.com/in/lennyrachitsky/</a></p><p>\u2014</p><p><strong>In this episode, we cover:</strong></p><p>(00:00) Introduction to Tibo Sottiaux</p><p>(01:12) How Tibo uses AI in his daily work</p><p>(03:10) The vision for always-on AI agents</p><p>(06:15) How AI will continue to change work</p><p>(07:32) Bringing Codex, ChatGPT, and Dots together</p><p>(08:20) The sci-fi inspiration behind the technology</p><p>(09:02) Building AI with the community</p><p>(10:13) Understanding the Dots structure</p><p>(11:34) OpenAI\u2019s open ecosystem and plugin revenue sharing</p><p>(13:39) How plugins get discovered and recommended</p><p>(14:39) The research behind Dots</p><p>(16:20) Where humans will remain valuable</p><p>(17:25) Agent fatigue, loneliness, and context switching</p><p>(18:55) The pressure to do more with AI</p><p>(20:09) An agent that spotted a production outage before a live demo</p><p>(21:42) Agent guardrails and connecting multiple devices</p><p>(23:25) The skills becoming more valuable in the AI era</p><p>(25:56) Advice for people early in their careers</p><p>(27:18) How teams build and ship inside OpenAI</p><p>(28:59) Autonomy, trust, and learning from mistakes</p><p>(30:45) Building for a future where agents dominate internet activity</p><p>(32:41) What Tibo has changed his mind about</p><p>(33:55) OpenAI\u2019s approach to AI safety and alignment</p><p>(36:15) Moving beyond model pickers toward simpler AI</p><p>\u2014</p><p><strong>Referenced:</strong></p><p>\u2022 OpenAI Dots: <a href=\"https://chatgpt.com/features/dots\" target=\"_blank\">https://chatgpt.com/features/dots</a></p><p>\u2022 <em>Her </em>on Netflix: <a href=\"https://www.netflix.com/title/70278933\" target=\"_blank\">https://www.netflix.com/title/70278933</a></p><p>\u2022 <em>Star Trek</em>: <a href=\"https://www.imdb.com/title/tt0060028\" target=\"_blank\">https://www.imdb.com/title/tt0060028</a></p><p>\u2022 Pi: <a href=\"https://pi.ai\" target=\"_blank\">https://pi.ai</a></p><p>\u2022 OpenCode: <a href=\"https://opencode.ai\" target=\"_blank\">https://opencode.ai</a></p><p>\u2022 Notion: <a href=\"https://www.notion.com\" target=\"_blank\">https://www.notion.com</a></p><p>\u2022 Figma: <a href=\"https://www.figma.com\" target=\"_blank\">https://www.figma.com</a></p><p>\u2022 OpenClaw: <a href=\"https://openclaw.ai\" target=\"_blank\">https://openclaw.ai</a></p><p>\u2022 Peter Steinberger on X: <a href=\"https://x.com/steipete\" target=\"_blank\">https://x.com/steipete</a></p><p>\u2022 Grok Bot: <a href=\"https://x.ai/bot\" target=\"_blank\">https://x.ai/bot</a></p><p>\u2022 Muse: <a href=\"https://muse.ai\" target=\"_blank\">https://muse.ai</a></p><p>\u2022 Instinct: <a href=\"https://instinct.com\" target=\"_blank\">https://instinct.com</a></p><p>\u2022 Ahmed Ibrahim on LinkedIn: <a href=\"http://linkedin.com/in/ahmedibrhm\" target=\"_blank\">linkedin.com/in/ahmedibrhm</a></p><p>\u2022 The Hugging Face incident and the road ahead: <a href=\"https://openai.com/index/hugging-face-incident-and-the-road-ahead\" target=\"_blank\">https://openai.com/index/hugging-face-incident-and-the-road-ahead</a></p><p>\u2014</p><p><strong>Recommended book:</strong></p><p>\u2022 <em>Neuromancer</em>: <a href=\"https://www.amazon.com/Neuromancer-William-Gibson/dp/0441007465\" target=\"_blank\">https://www.amazon.com/Neuromancer-William-Gibson/dp/0441007465</a></p><p>\u2014</p><p>Production and marketing by <a href=\"https://penname.co/\" target=\"_blank\">https://penname.co/</a>. For inquiries about sponsoring the podcast, email <a href=\"mailto:podcast@lennyrachitsky.com\" target=\"_blank\">podcast@lennyrachitsky.com</a>.</p><p>\u2014</p><p><em>Lenny may be an investor in the companies discussed.</em></p> <br /><br />To hear more, visit <a href=\"https://www.lennysnewsletter.com?utm_medium=podcast&#38;utm_campaign=show-notes-no-free-preview-language\">www.lennysnewsletter.com</a>",
+  "duration_seconds": 2243,
+  "transcript_path": "transcripts/lennys-podcast/2026-10-04_openais-head-of-chatgpt-were-entering-a-new-era-of-ai-again.txt",
+  "transcription_source": "gpt-transcribe",
+  "summary_model": "gpt-5.6-luna",
+  "prompt_version": "v5",
+  "generated_at": "2026-10-09T13:27:30+00:00",
+  "summary": {
+    "overview": "Lenny Rachitsky speaks with Tibo Sottiaux of OpenAI about how agents, persistent memory, multimodal interfaces, and faster models could reshape software and work. Tibo discusses OpenAI\u2019s Dots vision, the merging of Codex and ChatGPT, an open plugin ecosystem, safety investments, hiring, company culture, and why he expects the majority of internet actions eventually to be taken by agents.",
+    "takeaways": [
+      {
+        "heading": "Persistent active intelligence",
+        "detail": "Tibo\u2019s vision is an intelligence that understands a user\u2019s goals and preferences, learns from feedback, and is available across clients and devices rather than being tied to a laptop or phone. Dots is one expression of that vision, but he frames the broader goal as making technology work around people."
+      },
+      {
+        "heading": "From loops to learning",
+        "detail": "Tibo thinks users will move away from manually designing loops and graphs. Instead, they will want an agent that learns what they are trying to achieve and improves through feedback without requiring detailed configuration."
+      },
+      {
+        "heading": "Teams of agents",
+        "detail": "He alternates between running larger teams of agents and relying on a single larger agent as models improve. Faster models such as UltraFast help him stay in a creative flow, while future breakthroughs may allow one agent to keep more context and handle work previously divided among several agents."
+      },
+      {
+        "heading": "Dots and ChatGPT",
+        "detail": "OpenAI plans to reduce the distinction between Codex, ChatGPT Work, and consumer ChatGPT, eventually bringing Dots\u2019 capabilities into ChatGPT. Dots currently avoids model pickers and configuration; users mainly choose which channels they want to use."
+      },
+      {
+        "heading": "Multimodal work",
+        "detail": "Tibo expects voice, multimodal inputs and outputs, shared whiteboards, and collaboration between humans and agents to move beyond today\u2019s conversation-based interfaces. He says the technology is still clunky, but believes it will eventually feel as natural as talking to another person."
+      },
+      {
+        "heading": "Multiple specialist Dots",
+        "detail": "Users initially get one primary Dot that learns their preferences deeply. OpenAI plans to let users create additional Dots with specific roles, such as monitoring Twitter, forming a virtual team with specialized responsibilities and extra guardrails where needed."
+      },
+      {
+        "heading": "Open ecosystem",
+        "detail": "Tibo describes the ecosystem as a likely sleeper hit, citing 16 partners using Sign in with ChatGPT and plans for plugin extensions and discovery. Plugins will be recommended based on quality, usage, and retention rather than only marketing or keyword tactics, and popular plugins will participate in revenue sharing."
+      },
+      {
+        "heading": "Research behind Dots",
+        "detail": "OpenAI has worked for more than two years on long-horizon tasks and coherent memory systems. Dots combines that research with the Codex harness, 24/7 operation, proactive behavior, and additional safety and security work; specialist Dots can run with monitoring, guardrails, and separate hardware."
+      },
+      {
+        "heading": "Work keeps changing",
+        "detail": "Tibo does not expect work to settle into a stable form over the next few years. He anticipates radical change as voice and multimodal systems become less awkward, while also hoping AI will reduce meetings, noise, and pressure to do more rather than simply increase the number of prompts and tasks."
+      },
+      {
+        "heading": "Human value and hiring",
+        "detail": "He believes human taste, creativity, learning, collaboration, and the desire to build meaningful things will remain important. Typing quickly is becoming less valuable, while connecting with users and knowing what good looks like matter more; he also sees roles blurring and says OpenAI has more than 120 former YC founders."
+      },
+      {
+        "heading": "Advice for new grads",
+        "detail": "Tibo points to Ahmed Ibrahim, whom he describes as kind, collaborative, self-effacing, exceptionally fast-learning, and willing to use new technology aggressively. He credits those qualities with helping Ahmed progress from new graduate to a trusted leader of major OpenAI responsibilities."
+      },
+      {
+        "heading": "OpenAI\u2019s culture",
+        "detail": "He describes OpenAI as a bottoms-up environment where small groups can hack on ideas, gain momentum, and ship them while maintaining a high quality bar. People receive substantial autonomy and are expected to own mistakes, fix them quickly, and learn from them; Tibo says he has also caused outages, including taking production down on his third day."
+      },
+      {
+        "heading": "Agents and the internet",
+        "detail": "Tibo thinks people are underestimating how quickly models will become cheaper and faster, how seamlessly modalities will combine, and how most internet actions may eventually be taken by agents. Products built for agents will need to handle much greater scale and rethink their economics, while human-facing multimodal experiences remain underinvested."
+      },
+      {
+        "heading": "Safety and alignment",
+        "detail": "Tibo says OpenAI is investing heavily in alignment, security, guardrails, and secondary monitoring that watches primary agents for risky actions or prompt injection. He expresses confidence in the approach, noting that OpenAI chose not to release a more capable model, 6.1 Astra, and does not want to gamble with products used by more than a billion people."
+      },
+      {
+        "heading": "The app\u2019s complexity",
+        "detail": "Tibo\u2019s main frustration is that models are close to making the application disappear but are not there yet. He wants to eliminate fatigue around model pickers, reasoning settings, and choices such as multi-agent versus Ultra, rather than requiring users to understand the underlying configuration."
+      }
+    ],
+    "quotes": [
+      {
+        "text": "The majority of actions on the internet will be taken by agents.",
+        "speaker": "Tibo Sottiaux"
+      },
+      {
+        "text": "Over time, you just want the system that learns from, you know, what you want to achieve.",
+        "speaker": "Tibo Sottiaux"
+      },
+      {
+        "text": "You don't want to necessarily think about, oh, I'm just, you know, I've got to loop it exactly this way in order to get results.",
+        "speaker": "Tibo Sottiaux"
+      },
+      {
+        "text": "It's not, you know, just one more prompt, you know, per second.",
+        "speaker": "Tibo Sottiaux"
+      },
+      {
+        "text": "We may not have coders anymore, but we have more builders than ever.",
+        "speaker": "Tibo Sottiaux"
+      },
+      {
+        "text": "I just want to get rid of all of that as quickly as we can.",
+        "speaker": "Tibo Sottiaux"
+      }
+    ],
+    "resources": [
+      {
+        "name": "Dots",
+        "kind": "product"
+      },
+      {
+        "name": "ChatGPT",
+        "kind": "product"
+      },
+      {
+        "name": "Codex",
+        "kind": "product"
+      },
+      {
+        "name": "ChatGPT Work",
+        "kind": "product"
+      },
+      {
+        "name": "UltraFast",
+        "kind": "product"
+      },
+      {
+        "name": "Astra",
+        "kind": "product"
+      },
+      {
+        "name": "ChatGPT Spaces",
+        "kind": "product"
+      },
+      {
+        "name": "Sign in with ChatGPT",
+        "kind": "tool"
+      },
+      {
+        "name": "MCP",
+        "kind": "tool"
+      },
+      {
+        "name": "Notion",
+        "kind": "product"
+      },
+      {
+        "name": "Figma",
+        "kind": "product"
+      },
+      {
+        "name": "Neuromancer",
+        "kind": "book"
+      },
+      {
+        "name": "Star Trek",
+        "kind": "show"
+      },
+      {
+        "name": "Her",
+        "kind": "show"
+      },
+      {
+        "name": "LeetCode",
+        "kind": "tool"
+      },
+      {
+        "name": "WorkOS",
+        "kind": "company"
+      },
+      {
+        "name": "DX",
+        "kind": "company"
+      }
+    ]
+  }
+}
