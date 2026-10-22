@@ -4,7 +4,10 @@ Weekly runner for the Mac's launchd job (installed by install.sh).
 launchd starts this every Friday at 9:00, at login, and once an hour. It only
 does work when a run is due, meaning no completed run since the most recent
 Friday 9:00, so a Mac that was asleep, off or offline at 9:00 catches up at
-the next chance and the other triggers exit straight away.
+the next chance and the other triggers exit straight away. "Asleep" includes
+dark wakes, the few seconds a sleeping Mac wakes for background upkeep:
+launchd fires then, but a run started then is frozen mid-request when the Mac
+dozes off again, so it waits for a real wake.
 
 A run: bring this clone up to date with origin/main, run podcast_digest.py,
 commit the new summaries and transcripts, and push to main (which makes
@@ -18,6 +21,7 @@ Usage:
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -35,6 +39,7 @@ LOG_FILE = Path.home() / "Library" / "Logs" / "podcast-digest" / "run.log"
 RUN_WEEKDAY = 4          # Friday (Monday is 0)
 RUN_HOUR = 9
 STALE_LOCK_SECONDS = 3 * 3600
+SLEPT_THRESHOLD_SECONDS = 60
 
 
 def log(message):
@@ -59,6 +64,23 @@ def is_due(now):
     except (FileNotFoundError, ValueError):
         return True
     return last_run < last_scheduled_time(now)
+
+
+def awake():
+    """False in a dark wake: the screen and graphics stay off while the Mac
+    does a few seconds of upkeep before sleeping again."""
+    try:
+        state = subprocess.run(["pmset", "-g", "systemstate"], capture_output=True, text=True, timeout=10).stdout
+    except Exception:
+        return True  # can't tell; don't block the run on it
+    capabilities = next((line for line in state.splitlines() if "Capabilities" in line), None)
+    return capabilities is None or "Graphics" in capabilities
+
+
+def seconds_asleep(start_wall, start_uptime):
+    """How long the Mac slept since the two readings: wall-clock time keeps
+    going during sleep, CLOCK_UPTIME_RAW doesn't."""
+    return (time.time() - start_wall) - (time.clock_gettime(time.CLOCK_UPTIME_RAW) - start_uptime)
 
 
 def online():
@@ -107,6 +129,11 @@ def commit_outputs():
 
 
 def run(now):
+    # Hold off idle sleep until this process exits (closing the lid on
+    # battery still sleeps; the check after the pipeline handles that).
+    subprocess.Popen(["caffeinate", "-i", "-w", str(os.getpid())])
+    start_wall, start_uptime = time.time(), time.clock_gettime(time.CLOCK_UPTIME_RAW)
+
     git("checkout", "-q", "main")
     # Keep what an interrupted run already paid to produce: commit its
     # leftover files, then rebase (not reset) so that commit, or one whose
@@ -122,9 +149,18 @@ def run(now):
         push()
         log(f"Pushed to main: {len(new)} new summar{'y' if len(new) == 1 else 'ies'}")
 
-    # Record the week as done even if an episode failed: re-running hourly
-    # would pay for transcription again each time. Failed episodes are still
-    # in the 14-day window next Friday, and the notification says to check.
+    # A failure while the Mac slept is most likely dropped connections, so
+    # leave the week open and retry within the hour. A paid-for transcript is
+    # cached, so the retry doesn't transcribe again.
+    if pipeline.returncode != 0 and seconds_asleep(start_wall, start_uptime) > SLEPT_THRESHOLD_SECONDS:
+        notify(f"Interrupted by sleep ({len(new)} new); will retry within the hour")
+        log(f"Run interrupted by sleep (pipeline exit code {pipeline.returncode}); will retry within the hour")
+        return
+
+    # Otherwise record the week as done even if an episode failed: the
+    # failure is likely to repeat, and each retry can cost transcription.
+    # Failed episodes are still in the 14-day window next Friday, and the
+    # notification says to check.
     LAST_RUN_FILE.write_text(now.isoformat(timespec="seconds"))
     if pipeline.returncode != 0:
         notify(f"Finished with errors ({len(new)} new). See {LOG_FILE}")
@@ -150,6 +186,9 @@ def main():
             return
         log("Clearing a stale lock left by an interrupted run")
     try:
+        if not awake():
+            log("Mac is in a dark wake (asleep); will run once it's awake")
+            return
         if not online():
             log("Offline; will retry within the hour")
             return

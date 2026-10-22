@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .venv/
+.transcript_cache/
 .DS_Store
 # Experimental summaries, judge scores and reports. Local only.
 /evals/

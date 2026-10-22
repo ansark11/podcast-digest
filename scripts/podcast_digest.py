@@ -23,6 +23,7 @@ Required environment variables (set as a GitHub Actions secret):
 
 import os
 import re
+import hashlib
 import json
 import time
 import argparse
@@ -44,6 +45,10 @@ load_dotenv(BASE_DIR / ".env")
 SHOWS_FILE = BASE_DIR / "config" / "shows.json"
 SUMMARIES_DIR = BASE_DIR / "summaries"
 TRANSCRIPTS_DIR = BASE_DIR / "transcripts"
+# Paid-for audio transcripts whose summary step hasn't succeeded yet, so a
+# retry doesn't transcribe again. Gitignored; an entry is removed once its
+# episode is saved.
+TRANSCRIPT_CACHE_DIR = BASE_DIR / ".transcript_cache"
 
 TRANSCRIPTION_MAX_BYTES = 24 * 1024 * 1024  # stay safely under the 25MB API limit
 CHUNK_MS = 10 * 60 * 1000                   # split long episodes into 10-minute chunks
@@ -523,22 +528,36 @@ def refresh_metadata(shows):
         print(f"Metadata: updated {updated} of {len(stale)} incomplete summary file(s) for {show['name']}")
 
 
+def cached_transcript_path(guid):
+    return TRANSCRIPT_CACHE_DIR / f"{hashlib.sha256(guid.encode()).hexdigest()[:16]}.txt"
+
+
 def process_episode(show_name, episode):
     """Transcribe + summarize one episode, saving its summary and transcript. Returns the summary dict."""
+    cache_path = cached_transcript_path(episode["guid"])
     transcript = fetch_feed_transcript(episode.get("feed_transcript_tag"))
     if transcript:
         print("  Using transcript published in the feed (skipped audio transcription)")
         transcription_source = "feed"
+    elif cache_path.exists():
+        print("  Reusing the transcript from an earlier run that failed after transcribing")
+        transcript = cache_path.read_text()
+        transcription_source = TRANSCRIPTION_MODEL
     else:
         with tempfile.TemporaryDirectory() as tmp_dir:
             audio_path = os.path.join(tmp_dir, "episode.mp3")
             download_audio(episode["audio_url"], audio_path)
             transcript = transcribe_audio(audio_path, context=f"Podcast: {show_name}. Episode: {episode['title']}.")
         transcription_source = TRANSCRIPTION_MODEL
+        # Keep it before summarizing: transcription is ~97% of the cost, so a
+        # failed summary shouldn't mean paying for it again on the retry.
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(transcript)
 
     prompt = build_summary_prompt(show_name, episode["title"], transcript)
     summary = summarize_transcript(prompt)
     save_episode_outputs(show_name, episode, transcript, summary, transcription_source)
+    cache_path.unlink(missing_ok=True)
     return summary
 
 

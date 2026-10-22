@@ -138,9 +138,12 @@ produces it. Eval scripts never promote anything on their own.
 
 ## How it works
 1. launchd starts `scripts/scheduler/weekly_run.py` every Friday at 9:00.
-   If the Mac is asleep then, it runs on wake; if it was off, at the next
-   login; if it's offline, it retries hourly until it gets through. A macOS
-   notification reports new summaries or errors
+   If the Mac is asleep then, it runs on the next real wake (not the brief
+   background "dark wakes" a sleeping Mac does); if it was off, at the next
+   login; if it's offline, it retries hourly until it gets through. If the Mac
+   sleeps mid-run and an episode fails, it retries within the hour, reusing
+   any transcript it already paid for. A macOS notification reports new
+   summaries or errors
 2. For each show, it takes the RSS feed's episodes from the last 14 days
    (`LOOKBACK_DAYS`) and skips any that already have a file in
    `summaries/`. An episode that failed has no file, so the next run
@@ -169,4 +172,5 @@ input/output tokens) is under a cent per episode.
 pip install -r requirements.txt
 cp .env.example .env   # then fill in your key — .env is gitignored
 python scripts/podcast_digest.py
+python -m unittest discover -s tests   # unit tests
 ```
