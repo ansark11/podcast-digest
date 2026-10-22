@@ -34,7 +34,7 @@ install -m 600 "$SRC/.env" "$REPO/.env"
 [ -x "$VENV/bin/python" ] || "$PYTHON" -m venv "$VENV"
 "$VENV/bin/pip" install -q -r "$REPO/requirements.txt"
 
-# The first run is the next Friday 9:00, not the moment this is installed.
+# The first run is the next Wednesday 19:00, not the moment this is installed.
 [ -f "$APP/last_run" ] || date +%Y-%m-%dT%H:%M:%S > "$APP/last_run"
 
 cat > "$PLIST" <<EOF
@@ -48,9 +48,9 @@ cat > "$PLIST" <<EOF
     <string>$VENV/bin/python</string>
     <string>$REPO/scripts/scheduler/weekly_run.py</string>
   </array>
-  <!-- Fridays 9:00 local time. If the Mac is asleep then, launchd runs it on wake. -->
+  <!-- Wednesdays 19:00 local time. If the Mac is asleep then, launchd runs it on wake. -->
   <key>StartCalendarInterval</key>
-  <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
+  <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>19</integer><key>Minute</key><integer>0</integer></dict>
   <!-- Catch-up triggers: at login (the Mac was off) and hourly (it was offline).
        weekly_run.py exits immediately unless a run is actually due. -->
   <key>RunAtLoad</key><true/>
@@ -66,7 +66,7 @@ EOF
 launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$PLIST"
 
-echo "Installed $LABEL. Next run: Friday 9:00."
+echo "Installed $LABEL. Next run: Wednesday 19:00."
 echo "  Run now:   \"$VENV/bin/python\" \"$REPO/scripts/scheduler/weekly_run.py\" --force"
 echo "  Log:       $LOGS/run.log"
 echo "  Remove:    launchctl bootout gui/\$(id -u)/$LABEL && rm \"$PLIST\""

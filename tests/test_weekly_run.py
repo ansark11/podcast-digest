@@ -2,6 +2,7 @@ import subprocess
 import sys
 import time
 import unittest
+from datetime import datetime
 from pathlib import Path
 from unittest import mock
 
@@ -12,6 +13,15 @@ import weekly_run  # noqa: E402
 def pmset_output(text):
     return mock.patch.object(weekly_run.subprocess, "run",
                              return_value=subprocess.CompletedProcess([], 0, stdout=text))
+
+
+class LastScheduledTimeTest(unittest.TestCase):
+    def test_wednesday_7pm(self):
+        wed_7pm = datetime(2026, 10, 21, 19, 0)
+        self.assertEqual(weekly_run.last_scheduled_time(datetime(2026, 10, 21, 19, 0)), wed_7pm)
+        self.assertEqual(weekly_run.last_scheduled_time(datetime(2026, 10, 27, 23, 59)), wed_7pm)
+        # Wednesday before 7 PM still belongs to the previous week.
+        self.assertEqual(weekly_run.last_scheduled_time(datetime(2026, 10, 21, 18, 59)), datetime(2026, 10, 14, 19, 0))
 
 
 class AwakeTest(unittest.TestCase):

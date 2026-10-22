@@ -36,7 +36,7 @@ Put it in `.env` (`cp .env.example .env`; `.env` is gitignored).
 ```bash
 scripts/scheduler/install.sh
 ```
-This sets up a launchd job that runs every Friday at 9:00 local time. It runs
+This sets up a launchd job that runs every Wednesday at 19:00 (7 PM) local time. It runs
 from its own clone of `main` in `~/Library/Application Support/podcast-digest`
 (background jobs can't read `~/Documents`), so it never touches your working
 copy. Re-run the installer after changing `.env`.
@@ -46,7 +46,7 @@ Make sure your filled-in `config/shows.json` is committed. Unlike API keys,
 it's not a secret.
 
 ### 6. Test it
-Run it once now instead of waiting for Friday (the installer prints the
+Run it once now instead of waiting for Wednesday (the installer prints the
 exact command):
 ```bash
 ~/Library/Application\ Support/podcast-digest/venv/bin/python \
@@ -137,7 +137,7 @@ A take only becomes the official summary when the production pipeline
 produces it. Eval scripts never promote anything on their own.
 
 ## How it works
-1. launchd starts `scripts/scheduler/weekly_run.py` every Friday at 9:00.
+1. launchd starts `scripts/scheduler/weekly_run.py` every Wednesday at 19:00.
    If the Mac is asleep then, it runs on the next real wake (not the brief
    background "dark wakes" a sleeping Mac does); if it was off, at the next
    login; if it's offline, it retries hourly until it gets through. If the Mac

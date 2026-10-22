@@ -1,9 +1,9 @@
 """
 Weekly runner for the Mac's launchd job (installed by install.sh).
 
-launchd starts this every Friday at 9:00, at login, and once an hour. It only
+launchd starts this every Wednesday at 19:00, at login, and once an hour. It only
 does work when a run is due, meaning no completed run since the most recent
-Friday 9:00, so a Mac that was asleep, off or offline at 9:00 catches up at
+Wednesday 19:00, so a Mac that was asleep, off or offline then catches up at
 the next chance and the other triggers exit straight away. "Asleep" includes
 dark wakes, the few seconds a sleeping Mac wakes for background upkeep:
 launchd fires then, but a run started then is frozen mid-request when the Mac
@@ -36,8 +36,8 @@ LAST_RUN_FILE = APP_DIR / "last_run"
 LOCK_DIR = APP_DIR / "run.lock"
 LOG_FILE = Path.home() / "Library" / "Logs" / "podcast-digest" / "run.log"
 
-RUN_WEEKDAY = 4          # Friday (Monday is 0)
-RUN_HOUR = 9
+RUN_WEEKDAY = 2          # Wednesday (Monday is 0)
+RUN_HOUR = 19
 STALE_LOCK_SECONDS = 3 * 3600
 SLEPT_THRESHOLD_SECONDS = 60
 
@@ -52,7 +52,7 @@ def notify(message):
 
 
 def last_scheduled_time(now):
-    """The most recent Friday 9:00 at or before `now`."""
+    """The most recent Wednesday 19:00 at or before `now`."""
     candidate = (now - timedelta(days=(now.weekday() - RUN_WEEKDAY) % 7)).replace(
         hour=RUN_HOUR, minute=0, second=0, microsecond=0)
     return candidate if candidate <= now else candidate - timedelta(days=7)
@@ -159,7 +159,7 @@ def run(now):
 
     # Otherwise record the week as done even if an episode failed: the
     # failure is likely to repeat, and each retry can cost transcription.
-    # Failed episodes are still in the 14-day window next Friday, and the
+    # Failed episodes are still in the 14-day window next Wednesday, and the
     # notification says to check.
     LAST_RUN_FILE.write_text(now.isoformat(timespec="seconds"))
     if pipeline.returncode != 0:
