@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "guid": "substack:post:219139599",
+  "show": "Lenny's Podcast",
+  "show_slug": "lennys-podcast",
+  "episode_title": "Inside the black box of AI: How AI models actually think | Emmanuel Ameisen (Anthropic)",
+  "published": "2026-10-18T12:31:36+00:00",
+  "audio_url": "https://pscrb.fm/rss/p/api.substack.com/feed/podcast/219139599/90039a78d32af2fbdc8b895d58abe6b4.mp3",
+  "episode_url": "https://www.lennysnewsletter.com/p/a-mind-expanding-conversation-on",
+  "artwork_url": "https://substackcdn.com/feed/podcast/10845/post/219139599/f929ebe3fbe737eb16a634529ac22f11.jpg",
+  "description_html": "<p><strong>Emmanuel Ameisen</strong> is an interpretability researcher at Anthropic, where he looks inside LLMs like Claude to understand how they think. Before joining Anthropic, he spent years in applied ML at Stripe and Insight, and is the author of <em>Building Machine Learning Powered Applications</em>. His research has produced some of the most striking findings in the field: that models form general representations of concepts, plan many tokens ahead without stating those plans explicitly, and may exhibit something structurally similar to the distinction between conscious and unconscious processing in humans.</p><p></p><p><strong>We discuss:</strong></p><p>1. Why the \u201cnext-token predictor\u201d framing undersells how models actually plan and think</p><p>2. Why anthropomorphizing AI can actually be the right approach</p><p>3. Why models are \u201cgrown,\u201d not built</p><p>4. What the \u201cJ space\u201d reveals about model self-awareness</p><p>5. The smooth scaling curve behind what look like sudden capability jumps</p><p>6. How interpretability connects to AI alignment and safety</p><p>\u2014</p><p><strong>Brought to you by:</strong></p><p><a href=\"https://workos.com/lenny\" target=\"_blank\"><strong>WorkOS</strong></a>\u2014Make your app enterprise-ready, with SSO, SCIM, RBAC, and more</p><p><a href=\"https://getdx.com/?utm_source=lenny&#38;utm_medium=sponsorship&#38;utm_campaign=q42026\" target=\"_blank\"><strong>DX</strong></a>\u2014Engineering intelligence for the AI era</p><p>\u2014</p><p><strong>Episode transcript: </strong><a href=\"https://www.lennysnewsletter.com/p/a-mind-expanding-conversation-on\" target=\"_blank\">https://www.lennysnewsletter.com/p/a-mind-expanding-conversation-on</a></p><p>\u2014</p><p><strong>Archive of all Lenny's Podcast transcripts: </strong><a href=\"https://www.dropbox.com/scl/fo/yxi4s2w998p1gvtpu4193/AMdNPR8AOw0lMklwtnC0TrQ?rlkey=j06x0nipoti519e0xgm23zsn9&#38;st=ahz0fj11&#38;dl=0\" target=\"_blank\">https://www.dropbox.com/scl/fo/yxi4s2w998p1gvtpu4193/AMdNPR8AOw0lMklwtnC0TrQ?rlkey=j06x0nipoti519e0xgm23zsn9&amp;st=ahz0fj11&amp;dl=0</a></p><p>\u2014</p><p><strong>Highlights:</strong> <a href=\"https://lennyspodcast.com/mostreplayedmoments\" target=\"_blank\">https://lennyspodcast.com/mostreplayedmoments</a></p><p>\u2014</p><p><strong>Where to find Emmanuel Ameisen:</strong></p><p>\u2022 X: <a href=\"https://x.com/mlpowered\" target=\"_blank\">https://x.com/mlpowered</a></p><p>\u2022 LinkedIn: <a href=\"https://www.linkedin.com/in/ameisen\" target=\"_blank\">https://www.linkedin.com/in/ameisen</a></p><p>\u2022 Website: <a href=\"https://www.mlpowered.com\" target=\"_blank\">https://www.mlpowered.com</a></p><p>\u2014</p><p><strong>Where to find Lenny:</strong></p><p>\u2022 Newsletter: <a href=\"https://www.lennysnewsletter.com\" target=\"_blank\">https://www.lennysnewsletter.com</a></p><p>\u2022 X: <a href=\"https://twitter.com/lennysan\" target=\"_blank\">https://twitter.com/lennysan</a></p><p>\u2022 LinkedIn: <a href=\"https://www.linkedin.com/in/lennyrachitsky/\" target=\"_blank\">https://www.linkedin.com/in/lennyrachitsky/</a></p><p>\u2014</p><p><strong>In this episode, we cover:</strong></p><p>(00:00) Introduction to Emmanuel Ameisen</p><p>(01:30) Why AI models are grown, not built</p><p>(05:57) Why next-token prediction is harder than it sounds</p><p>(11:49) How models represent concepts and understand the world</p><p>(17:06) How LLMs plan ahead</p><p>(23:10) Could AI be conscious?</p><p>(24:44) Scaling laws and the power of text</p><p>(28:29) Why smooth progress creates sudden breakthroughs</p><p>(32:59) Why watching AI isn\u2019t enough to solve alignment</p><p>(38:21) The Golden Gate Claude experiment</p><p>(39:01) Why Anthropic takes AI safety seriously</p><p>(42:06) When anthropomorphizing AI is useful</p><p>(48:06) What AI can teach us about intelligence</p><p>(51:44) Reasons for optimism about AI alignment</p><p>(55:43) Are we living in a simulation?</p><p>(59:00) Jev, decision models, and AI\u2019s gut instincts</p><p>(01:01:37) Two more surprising findings about how models think</p><p>(01:03:33) How to get into interpretability research</p><p>(01:04:55) Lightning round and final thoughts</p><p>\u2014</p><p><strong>References: </strong><a href=\"https://www.lennysnewsletter.com/p/a-mind-expanding-conversation-on\" target=\"_blank\">https://www.lennysnewsletter.com/p/a-mind-expanding-conversation-on</a></p><p>\u2014</p><p>Production and marketing by <a href=\"https://penname.co/\" target=\"_blank\">https://penname.co/</a>. For inquiries about sponsoring the podcast, email <a href=\"mailto:podcast@lennyrachitsky.com\" target=\"_blank\">podcast@lennyrachitsky.com</a>.</p><p>\u2014</p><p><em>Lenny may be an investor in the companies discussed.</em></p> <br /><br />To hear more, visit <a href=\"https://www.lennysnewsletter.com?utm_medium=podcast&#38;utm_campaign=show-notes-no-free-preview-language\">www.lennysnewsletter.com</a>",
+  "duration_seconds": 4332,
+  "transcript_path": "transcripts/lennys-podcast/2026-10-18_inside-the-black-box-of-ai-how-ai-models-actually-think-emma.txt",
+  "transcription_source": "gpt-transcribe",
+  "summary_model": "gpt-5.6-luna",
+  "prompt_version": "v5",
+  "generated_at": "2026-10-22T23:45:44+00:00",
+  "summary": {
+    "overview": "Emmanuel Ameisen, who works on interpretability at Anthropic, explains how researchers study what happens inside language models rather than treating them as understandable software. He describes models as grown through training, shows evidence that they form concepts and plans despite generating one token at a time, and discusses what this means for AI safety, consciousness, anthropomorphism, and the future pace of progress.",
+    "takeaways": [
+      {
+        "heading": "Models are grown",
+        "detail": "LLMs are not programmed with explicit rules that explain their behavior. They are trained first on next-token prediction and then fine-tuned on examples of desired behavior, while the resulting mathematical formulas and intermediate representations remain largely inscrutable."
+      },
+      {
+        "heading": "Next-token prediction is harder",
+        "detail": "A simple autocomplete mental model misses what advanced models must do. Predicting difficult text\u2014such as a physics answer, a thesis paragraph, or the ending of a mystery\u2014requires representing facts and relationships about the world."
+      },
+      {
+        "heading": "Models represent concepts",
+        "detail": "Interpretability researchers can sometimes decode intermediate numerical states and find representations for concepts such as Texas, capitals, eyes, and other ideas across different contexts and languages. These representations can then be manipulated to test whether the interpretation is correct."
+      },
+      {
+        "heading": "Planning between tokens",
+        "detail": "Although models output one word at a time, earlier intermediate results remain accessible to later words. In poetry experiments, models appear to form an unstated plan about rhymes and then repeatedly refer back to it while writing."
+      },
+      {
+        "heading": "Interpretability methods",
+        "detail": "Researchers record intermediate activations while passing large amounts of text through a model, look for patterns associated with concepts, and alter activations to see whether the model changes as predicted. Ameisen compares this process to studying the brain by observing what activates in response to different stimuli."
+      },
+      {
+        "heading": "Emergent complexity",
+        "detail": "Ameisen says the more he looks inside models, the less confident he becomes in simple descriptions of how they work. Models combine general concepts, planning, higher-order reasoning, and lower-level operations in ways that emerge from training rather than being explicitly designed."
+      },
+      {
+        "heading": "Smooth progress, sudden usefulness",
+        "detail": "The underlying improvement in model capability can be smooth, while usefulness appears to jump when performance crosses a reliability threshold for a task. Ameisen describes coding moving from mostly unreliable assistance to something Claude can handle for much of his code."
+      },
+      {
+        "heading": "Why scaling worked",
+        "detail": "The important bet was not merely adding compute, but applying compute to a rich objective\u2014predicting text\u2014that continues to improve predictably and correlates with tasks people care about. Ameisen says the field had underestimated how much capability could emerge from this combination."
+      },
+      {
+        "heading": "Alignment is a loop",
+        "detail": "Alignment involves shaping Claude to be helpful, harmless, and honest, then checking whether training actually produced those properties. Interpretability can reveal whether good behavior is genuine or only appears when the model believes it is being watched, while observed problems can feed back into new training."
+      },
+      {
+        "heading": "Investigating failures",
+        "detail": "A model that repeatedly answered a math problem with 36 instead of the correct 12 appeared to have an excessive internal activation for 36 before solving the problem. The behavior was traced to training examples where similar answers had incorrectly been labeled 36, producing a conflict between its mathematical reasoning and learned reward pressure."
+      },
+      {
+        "heading": "Safety and monitoring",
+        "detail": "Some safety work is ordinary engineering, such as limiting a model\u2019s access to the internet or a computer. Other work involves understanding its propensities, monitoring behavior, and detecting information represented internally but not stated aloud."
+      },
+      {
+        "heading": "Anthropomorphic language",
+        "detail": "Ameisen thinks describing models with terms such as planning, frustration, surprise, or deception can be useful, though models are not simply humans or conventional tools. They learn from human text and dialogue, simulate characters, and are optimized to discover strategies that complete tasks."
+      },
+      {
+        "heading": "Consciousness remains open",
+        "detail": "Ameisen says it is difficult to determine whether AI is conscious. He believes people underestimate the complexity that emerges inside models, and that interpretability may provide evidence less biased by what a model says about itself."
+      },
+      {
+        "heading": "Safety outlook",
+        "detail": "Ameisen is personally optimistic that alignment can be addressed because people are increasingly paying attention and can shift resources as capabilities and risks change. He emphasizes taking continued rapid improvement seriously and keeping the public informed."
+      },
+      {
+        "heading": "Human-like mechanisms",
+        "detail": "Researchers have found models developing gut-check-like signals that flag implausible answers without repeating the full calculation. They can also represent a requested secondary idea while performing another task, even though there is no obvious training requirement that they do so."
+      },
+      {
+        "heading": "Simulation hypothesis",
+        "detail": "Seeing similar internal structures emerge in different models makes Ameisen think there may be fundamental efficient structures that intelligence converges on. He says this makes a simulation possible to him, though he is not sure and does not know why such a simulation would be run."
+      },
+      {
+        "heading": "Fast decisions",
+        "detail": "Ameisen views quick decision models such as Jev as analogous in some ways to system-one thinking: choosing among options without extended reasoning. He expects intelligent systems to combine these fast judgments with slower, more deliberate reasoning for harder tasks."
+      },
+      {
+        "heading": "Entering interpretability",
+        "detail": "The field includes machine-learning researchers and former neuroscientists, but Ameisen says the on-ramp is largely self-study because the field is new. He recommends reading key papers and experimenting with open-source tools such as Neuronpedia."
+      },
+      {
+        "heading": "Living in the moment",
+        "detail": "Discussing Four Thousand Weeks, Ameisen criticizes the \u201cwhen I finally\u201d mentality\u2014the idea that happiness begins after a future achievement. He favors being present, illustrated by the phrase \u201cEnjoy the sandwich,\u201d rather than constantly projecting toward the next milestone."
+      }
+    ],
+    "quotes": [
+      {
+        "text": "One of the most important things to realize if you, like, use language models or think about them is just this, like, very bizarre fact that to make them is not to understand them.",
+        "speaker": "Emmanuel Ameisen"
+      },
+      {
+        "text": "All of the intermediate results that they've, that they've, like, produced when they were predicting a word, you know, let's say, like, the fifth word that they predicted, they can be reused.",
+        "speaker": "Emmanuel Ameisen"
+      },
+      {
+        "text": "The more you look inside, the less certain you are about how they work.",
+        "speaker": "Emmanuel Ameisen"
+      },
+      {
+        "text": "And denial is just, This is just not possible. If all you're doing is predicting the next word, it's not possible that you could ever, like, match, you know, the best specialists in our field. And I think that position just gets harder and harder.",
+        "speaker": "Emmanuel Ameisen"
+      },
+      {
+        "text": "And curiosity is kind of the road I've ended up choosing.",
+        "speaker": "Emmanuel Ameisen"
+      },
+      {
+        "text": "Like evolution, pretty simple objective. You know, you sort of like shake things around for a while and, like, keep the organisms that manage to adapt to the environment, and at the end you get jazz and podcasts.",
+        "speaker": "Emmanuel Ameisen"
+      },
+      {
+        "text": "Probably if you're telling yourself, When I finally do X, I'll be happy, when you do X, you will not be happy.",
+        "speaker": "Emmanuel Ameisen"
+      }
+    ],
+    "resources": [
+      {
+        "name": "Claude",
+        "kind": "product"
+      },
+      {
+        "name": "Anthropic",
+        "kind": "company"
+      },
+      {
+        "name": "WorkOS",
+        "kind": "company"
+      },
+      {
+        "name": "DX",
+        "kind": "tool"
+      },
+      {
+        "name": "Neuronpedia",
+        "kind": "tool"
+      },
+      {
+        "name": "A Brief History of Intelligence",
+        "kind": "book"
+      },
+      {
+        "name": "Story of Your Life and Others",
+        "kind": "book"
+      },
+      {
+        "name": "Four Thousand Weeks",
+        "kind": "book"
+      },
+      {
+        "name": "Obsession",
+        "kind": "other"
+      },
+      {
+        "name": "Bref 2",
+        "kind": "show"
+      },
+      {
+        "name": "Jev",
+        "kind": "product"
+      },
+      {
+        "name": "Apple Watch Ultra",
+        "kind": "product"
+      },
+      {
+        "name": "Lenny's Podcast",
+        "kind": "show"
+      }
+    ]
+  }
+}
