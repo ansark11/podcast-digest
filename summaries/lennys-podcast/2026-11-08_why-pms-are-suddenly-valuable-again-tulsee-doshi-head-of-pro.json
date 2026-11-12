@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "guid": "substack:post:219474705",
+  "show": "Lenny's Podcast",
+  "show_slug": "lennys-podcast",
+  "episode_title": "Why PMs are suddenly valuable again | Tulsee Doshi (Head of Product, Gemini)",
+  "published": "2026-11-08T13:31:32+00:00",
+  "audio_url": "https://pscrb.fm/rss/p/api.substack.com/feed/podcast/219474705/120c52772b1e5a4f640d8a9add8ed0ea.mp3",
+  "episode_url": "https://www.lennysnewsletter.com/p/what-it-actually-takes-to-build-frontier",
+  "artwork_url": "https://substackcdn.com/feed/podcast/10845/post/219474705/0dc9fab790633f6b4375f01d4e882104.jpg",
+  "description_html": "<p><strong>Tulsee Doshi</strong> is head of product for Google\u2019s frontier AI models, including Gemini and other multimodal models, such as Nano Banana, Genie, Veo, and Lyria.</p><p></p><p><strong>We discuss:</strong></p><p>1. Why model development is not just engineering, but also like Snape\u2019s potions class</p><p>2. Google\u2019s full-stack frontier AI strategy</p><p>3. What PMs do inside a frontier AI lab</p><p>4. Tulsee\u2019s 60-20-20 framework for balancing what works now and what\u2019s almost working</p><p>5. How to write your first eval</p><p>6. The rising value of great PMs</p><p>\u2014</p><p><strong>Brought to you by:</strong></p><p><a href=\"https://workos.com/lenny\" target=\"_blank\"><strong>WorkOS</strong></a>\u2014Make your app enterprise-ready, with SSO, SCIM, RBAC, and more</p><p><a href=\"https://getdx.com/?utm_source=lenny&#38;utm_medium=sponsorship&#38;utm_campaign=q42026\" target=\"_blank\"><strong>DX</strong></a>\u2014Engineering intelligence for the AI era</p><p>\u2014</p><p><strong>Episode transcript:</strong> <a href=\"https://www.lennysnewsletter.com/p/what-it-actually-takes-to-build-frontier\" target=\"_blank\">https://www.lennysnewsletter.com/p/what-it-actually-takes-to-build-frontier</a></p><p>\u2014</p><p><strong>Archive of all Lenny's Podcast transcripts: </strong><a href=\"https://www.dropbox.com/scl/fo/yxi4s2w998p1gvtpu4193/AMdNPR8AOw0lMklwtnC0TrQ?rlkey=j06x0nipoti519e0xgm23zsn9&#38;st=ahz0fj11&#38;dl=0\" target=\"_blank\">https://www.dropbox.com/scl/fo/yxi4s2w998p1gvtpu4193/AMdNPR8AOw0lMklwtnC0TrQ?rlkey=j06x0nipoti519e0xgm23zsn9&amp;st=ahz0fj11&amp;dl=0</a></p><p>\u2014</p><p><strong>Highlights:</strong> <a href=\"https://lennyspodcast.com/mostreplayedmoments\" target=\"_blank\">https://lennyspodcast.com/mostreplayedmoments</a></p><p>\u2014</p><p><strong>Where to find Tulsee Doshi:</strong></p><p>\u2022 X: <a href=\"https://x.com/tulseedoshi\" target=\"_blank\">https://x.com/tulseedoshi</a></p><p>\u2022 LinkedIn: <a href=\"http://linkedin.com/in/tulsee-doshi\" target=\"_blank\">linkedin.com/in/tulsee-doshi</a></p><p>\u2014</p><p><strong>Where to find Lenny:</strong></p><p>\u2022 Newsletter: <a href=\"https://www.lennysnewsletter.com\" target=\"_blank\">https://www.lennysnewsletter.com</a></p><p>\u2022 X: <a href=\"https://twitter.com/lennysan\" target=\"_blank\">https://twitter.com/lennysan</a></p><p>\u2022 LinkedIn: <a href=\"https://www.linkedin.com/in/lennyrachitsky/\" target=\"_blank\">https://www.linkedin.com/in/lennyrachitsky/</a></p><p>\u2014</p><p><strong>In this episode, we cover:</strong></p><p>(00:00) Teaser</p><p>(01:08) What people misunderstand about how models are built</p><p>(06:28) Google\u2019s strategy in the AI race</p><p>(09:57) AI safety, monitoring, and strengthening cyberdefenses</p><p>(14:10) Balancing fast launches with great user experiences</p><p>(17:02) Why the model itself has a UX</p><p>(19:21) Why product managers are becoming more valuable</p><p>(21:24) The skills that matter for research PMs</p><p>(23:04) How to build your first eval</p><p>(24:37) Getting better at judging a model\u2019s vibes</p><p>(26:15) Improving skin tone representation with better evals</p><p>(28:25) Evaluating the full experience, not just the model</p><p>(30:38) From crowdsourced flash teams to agent swarms</p><p>(33:13) The 60-20-20 rule for building ahead of model capabilities</p><p>(35:46) Keeping your product adaptable as models improve</p><p>(36:42) What an AI harness actually is</p><p>(37:30) Upskilling PMs through shared skills and workshops</p><p>(41:18) Building the habit of asking, \u201cCan AI do this for me?\u201d</p><p>(42:38) Google\u2019s opportunity to build a personal AI assistant</p><p>(44:10) Burnout, meaningful work, and the pressure to do more</p><p>(47:44) Avoiding AI slop</p><p>(49:30) How AI is changing the PM role</p><p>(51:02) Lightning round and final thoughts</p><p>\u2014</p><p><strong>References: </strong><a href=\"https://www.lennysnewsletter.com/p/what-it-actually-takes-to-build-frontier\" target=\"_blank\">https://www.lennysnewsletter.com/p/what-it-actually-takes-to-build-frontier</a></p><p>\u2014</p><p>Production and marketing by <a href=\"https://penname.co/\" target=\"_blank\">https://penname.co/</a>. For inquiries about sponsoring the podcast, email <a href=\"mailto:podcast@lennyrachitsky.com\" target=\"_blank\">podcast@lennyrachitsky.com</a>.</p><p>\u2014</p><p><em>Lenny may be an investor in the companies discussed.</em></p> <br /><br />To hear more, visit <a href=\"https://www.lennysnewsletter.com?utm_medium=podcast&#38;utm_campaign=show-notes-no-free-preview-language\">www.lennysnewsletter.com</a>",
+  "duration_seconds": 3513,
+  "transcript_path": "transcripts/lennys-podcast/2026-11-08_why-pms-are-suddenly-valuable-again-tulsee-doshi-head-of-pro.txt",
+  "transcription_source": "feed",
+  "summary_model": "gpt-5.6-luna",
+  "prompt_version": "v5",
+  "generated_at": "2026-11-12T00:00:28+00:00",
+  "summary": {
+    "overview": "Tulsee Doshi, Head of Product for Gemini and Google's frontier models, explains why managing AI products differs from traditional product development: models are measurable and trainable, but their behavior and \u201cvibes\u201d remain partly unpredictable. She discusses Google's full-stack AI strategy, responsible deployment, new expectations for PMs, practical evaluation methods, designing for rapidly improving models, team upskilling, burnout, and how AI is changing the substance of product work.",
+    "takeaways": [
+      {
+        "heading": "Models Have Surprising Behavior",
+        "detail": "Model development can be made as scientific as possible through monitoring, metrics, and interventions, but the result is not fully predictable. PMs must study what emerges, identify where a model uniquely shines, and shape those surprises into useful experiences."
+      },
+      {
+        "heading": "The Model Has A UX",
+        "detail": "UX includes not only the surrounding interface but also how transparent, communicative, inquisitive, and personable the model is. PMs collaborate with researchers to define what good behavior looks like, turn it into rubrics, and translate those rubrics into evaluation data and reward modeling."
+      },
+      {
+        "heading": "Google's Full-Stack Strategy",
+        "detail": "Doshi said Google wants to compete in frontier models while also using its hardware, models, and widely used products to create a broad range of experiences. The goal is to offer models across the cost-quality curve for users including search users, engineers, and cyber defenders."
+      },
+      {
+        "heading": "Safety Requires Monitoring",
+        "detail": "Safety is embedded from initial training through deployment. Doshi highlighted monitoring that can identify whether a model's directed actions are aligned and allow intervention, while also noting AI's potential to harden systems by finding and patching vulnerabilities."
+      },
+      {
+        "heading": "UX Depends On The User",
+        "detail": "Google is experimenting with new formats through products such as Flow and NotebookLM, while recognizing that products for billions of search users need a different level of accessibility than tools for power users working across terminals and IDEs."
+      },
+      {
+        "heading": "PMs Are Ascending",
+        "detail": "When building becomes easy, taste, problem selection, clarity, and consensus-building become distinctive advantages. Doshi said PMs help separate signal from noise and turn the speed of AI development from a source of chaos into coherent progress."
+      },
+      {
+        "heading": "What Research PMs Need",
+        "detail": "Doshi looks for PMs who use models daily, have strong opinions and personal use cases, understand model vibes, stress-test capabilities, inspect data, build evaluations, and remain adaptive as the market and roadmaps change."
+      },
+      {
+        "heading": "Start Evals Small",
+        "detail": "Rather than beginning with a large benchmark, she recommends starting with five prompts, or perhaps around 20 prompts, that stress-test a capability and reveal differences between models. Even acting as the initial human rater can clarify what \u201cgood\u201d means before scaling the evaluation."
+      },
+      {
+        "heading": "Test What You Care About",
+        "detail": "There is no single correct way to develop model intuition. People should test models on meaningful tasks\u2014such as visual work, writing, synthesis, financial analysis, PRDs, or strategy documents\u2014where current models show promise but are not yet perfect."
+      },
+      {
+        "heading": "Evals Need End-To-End Context",
+        "detail": "Evaluation quality depends on more than the model: judges, filters, mitigations, serving, and the production setup can all affect results. For audio, for example, naturalness, voice, tenor, and inflection may change during serving, so the full user experience must be evaluated."
+      },
+      {
+        "heading": "Build For Model Progress",
+        "detail": "Doshi's 60-20-20 framework suggests making roughly 60% of a product work now, 20% work well enough with near-term model improvements, and 20% represent a more aspirational experience with early signs of possibility. The exact numbers are flexible; the goal is to balance present usefulness with future capability."
+      },
+      {
+        "heading": "Keep Systems Adaptable",
+        "detail": "Products can become overly rigid around an older model. Teams should consistently retest new models rather than force them into existing structures, because the old harness may constrain what a better model can do."
+      },
+      {
+        "heading": "Harnesses Surround Models",
+        "detail": "Doshi described a harness as the model's operating environment: system instructions, tools, skills, context, and other information it can access. She cautioned that these layers may need to be reworked as models improve."
+      },
+      {
+        "heading": "Upskill Through Sharing",
+        "detail": "At Google, PMs who become effective with internal tools, data, traces, and model experimentation share their skills through workshops and repositories. Doshi said teams also need protected time and space to learn, build, and play rather than sprint continuously."
+      },
+      {
+        "heading": "AI And PM Work",
+        "detail": "AI has expanded PMs' ability to prototype and analyze data. Doshi framed the shift as moving PMs beyond writing requirements toward adding substantive \u201cheft,\u201d whether through prototypes, evaluations, data, or other artifacts that demonstrate the intended experience."
+      },
+      {
+        "heading": "Insight Versus Data",
+        "detail": "AI-generated documents are most useful when they gather and structure information such as usage, metrics, and feedback. Doshi said people should provide the insight while models provide the data, leaving more room for human creative thinking and writing."
+      },
+      {
+        "heading": "Burnout And Meaningful Work",
+        "detail": "Doshi acknowledged that her team is working very hard and said Google is still figuring out sustainable practices. In her view, burnout comes not only from long hours but also from churn, chaos, and unfulfilling grunt work; AI could help by removing friction and making more time for creative, meaningful work."
+      },
+      {
+        "heading": "Use AI Before Acting",
+        "detail": "Doshi and the host discussed building a habit of pausing before a task to ask whether AI can help. Doshi said one successful example can change a person's mindset and encourage them to try models on more parts of their work."
+      },
+      {
+        "heading": "Google Data Experiences",
+        "detail": "Asked why other assistants have moved faster to use Gmail, Calendar, and Docs data, Doshi said Google wants its data to power magical experiences and that teams are working on exciting things. She acknowledged that Google has more work to do and said to \u201cwatch this space.\u201d"
+      },
+      {
+        "heading": "Personal Recommendations",
+        "detail": "Doshi recommended Exhalation, Creativity, Inc., the ACOTAR series, Severance, and WhisperFlow. She also described \u201cseek serendipity\u201d as a guiding idea, and said classical Indian dance gives her a focused break from work and connects her with culture and community."
+      }
+    ],
+    "quotes": [
+      {
+        "text": "The model isn't predictable.",
+        "speaker": "Tulsee Doshi"
+      },
+      {
+        "text": "You can put all the ingredients in and you should be thoughtful about what you expect. But you also have to expect that there will be a little bit of magic and that that magic is going to be surprising and that that magic is going to be unique.",
+        "speaker": "Tulsee Doshi"
+      },
+      {
+        "text": "Taste is now really important.",
+        "speaker": "Tulsee Doshi"
+      },
+      {
+        "text": "I want PMs who have an opinion, who are playing with these models every day.",
+        "speaker": "Tulsee Doshi"
+      },
+      {
+        "text": "Start with even five prompts.",
+        "speaker": "Tulsee Doshi"
+      },
+      {
+        "text": "What you should be providing is the insight. What the model should be providing is the data.",
+        "speaker": "Tulsee Doshi"
+      },
+      {
+        "text": "Everything happens for a reason.",
+        "speaker": "Tulsee Doshi"
+      },
+      {
+        "text": "Seek serendipity.",
+        "speaker": "Tulsee Doshi"
+      }
+    ],
+    "resources": [
+      {
+        "name": "Gemini",
+        "kind": "product"
+      },
+      {
+        "name": "Gemma",
+        "kind": "product"
+      },
+      {
+        "name": "Nano Banana",
+        "kind": "product"
+      },
+      {
+        "name": "Lyria",
+        "kind": "product"
+      },
+      {
+        "name": "Flow",
+        "kind": "product"
+      },
+      {
+        "name": "NotebookLM",
+        "kind": "product"
+      },
+      {
+        "name": "Google AI Studio",
+        "kind": "product"
+      },
+      {
+        "name": "Veo",
+        "kind": "product"
+      },
+      {
+        "name": "WhisperFlow",
+        "kind": "tool"
+      },
+      {
+        "name": "Pixel",
+        "kind": "product"
+      },
+      {
+        "name": "Gboard",
+        "kind": "product"
+      },
+      {
+        "name": "Wiz",
+        "kind": "company"
+      },
+      {
+        "name": "WorkOS",
+        "kind": "company"
+      },
+      {
+        "name": "DX",
+        "kind": "company"
+      },
+      {
+        "name": "Exhalation",
+        "kind": "book"
+      },
+      {
+        "name": "Creativity, Inc.",
+        "kind": "book"
+      },
+      {
+        "name": "A Court of Thorns and Roses",
+        "kind": "book"
+      },
+      {
+        "name": "Throne of Glass",
+        "kind": "book"
+      },
+      {
+        "name": "Severance",
+        "kind": "show"
+      },
+      {
+        "name": "Michael Bernstein",
+        "kind": "person"
+      },
+      {
+        "name": "The Fitzpatrick scale",
+        "kind": "other"
+      },
+      {
+        "name": "The Monk Skin Tone Scale",
+        "kind": "other"
+      }
+    ]
+  }
+}
