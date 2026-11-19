@@ -6,3 +6,6 @@ __pycache__/
 .DS_Store
 # Experimental summaries, judge scores and reports. Local only.
 /evals/
+
+.claude/settings.local.json
+CLAUDE.local.md
